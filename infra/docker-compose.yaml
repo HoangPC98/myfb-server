@@ -1,0 +1,47 @@
+version: '3.7'
+services:
+  fb-api:
+    container_name: eco-api
+    image: eco-api
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    environment:
+      LOG_LEVEL: debug
+      DATABASE_HOST: eco-dbsql
+    ports:
+      - '127.0.0.1:3003:3000'
+    depends_on:
+      - fb-sql
+    restart: always
+    logging:
+      driver: 'json-file'
+      options:
+        max-file: '5'
+        max-size: '10m'
+
+  fb-sql:
+    container_name: fb-sql
+    build:
+      context: ./mysql
+    environment:
+      MYSQL_HOST: '0.0.0.0'
+      MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+      MYSQL_DATABASE: fb
+      MYSQL_USER: hoangpc
+      MYSQL_PASSWORD: hoangpc
+    ports:
+      - '127.0.0.1:3306:3306'
+    logging:
+      driver: 'json-file'
+      options:
+        max-file: '5'
+        max-size: '10m'
+
+  redis:
+    container_name: redis-stag
+    hostname: redis
+    image: redis
+    ports: 
+      - '127.0.0.1:6379:6379'
+
