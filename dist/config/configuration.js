@@ -10,7 +10,7 @@ exports.default = () => ({
         port: parseInt(process.env.DATABASE_PORT, 10) || 3306,
         username: process.env.DATABASE_USERNAME || 'hoangpc',
         password: process.env.DATABASE_PASSWORD || 'hoangpc',
-        logging: process.env.DATABASE_LOGGING === 'true' ? true : false,
+        logging: true,
     },
     ggAuth: {
         clientId: process.env.GOOGLE_CLIENT_ID,

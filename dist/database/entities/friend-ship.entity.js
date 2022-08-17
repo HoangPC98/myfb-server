@@ -21,26 +21,22 @@ var FriendShipStatus;
     FriendShipStatus["Pending"] = "pending";
     FriendShipStatus["BeFriended"] = "beFriended";
     FriendShipStatus["Blocked"] = "blocked";
+    FriendShipStatus["RejectFriend"] = "rejectFriend";
 })(FriendShipStatus = exports.FriendShipStatus || (exports.FriendShipStatus = {}));
 let FriendShip = class FriendShip extends base_entity_1.default {
 };
 __decorate([
-    (0, typeorm_1.PrimaryColumn)(),
-    __metadata("design:type", String)
+    (0, typeorm_1.PrimaryGeneratedColumn)(),
+    __metadata("design:type", Number)
 ], FriendShip.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.PrimaryColumn)(),
+    (0, typeorm_1.Column)(),
     __metadata("design:type", Number)
 ], FriendShip.prototype, "sender_uid", void 0);
 __decorate([
-    (0, typeorm_1.PrimaryColumn)(),
+    (0, typeorm_1.Column)(),
     __metadata("design:type", Number)
 ], FriendShip.prototype, "receiver_uid", void 0);
-__decorate([
-    (0, typeorm_1.ManyToOne)(() => user_entity_1.User, (user) => user.FriendShip),
-    (0, typeorm_1.JoinColumn)({ name: 'id' }),
-    __metadata("design:type", user_entity_1.User)
-], FriendShip.prototype, "User", void 0);
 __decorate([
     (0, typeorm_1.Column)({
         type: 'enum',
@@ -50,6 +46,16 @@ __decorate([
     }),
     __metadata("design:type", String)
 ], FriendShip.prototype, "status", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => user_entity_1.User),
+    (0, typeorm_1.JoinColumn)({ name: 'sender_uid' }),
+    __metadata("design:type", user_entity_1.User)
+], FriendShip.prototype, "Sender", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => user_entity_1.User),
+    (0, typeorm_1.JoinColumn)({ name: 'receiver_uid' }),
+    __metadata("design:type", user_entity_1.User)
+], FriendShip.prototype, "Receiver", void 0);
 FriendShip = __decorate([
     (0, typeorm_1.Entity)('friend_ships')
 ], FriendShip);

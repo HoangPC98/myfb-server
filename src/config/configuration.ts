@@ -9,7 +9,7 @@ export default () => ({
 
     username: process.env.DATABASE_USERNAME || 'hoangpc',
     password: process.env.DATABASE_PASSWORD || 'hoangpc',
-    logging: (process.env.DATABASE_LOGGING as string) === 'true' ? true : false,
+    logging: true,
   },
   ggAuth: {
     clientId: process.env.GOOGLE_CLIENT_ID,

@@ -1,0 +1,11 @@
+{
+    "singleQuote": true,
+    "trailingComma": "all",
+    "max-line-length": [
+        true,
+        {
+            "limit": 250,
+            "ignore-pattern": "^import |^export {(.*?)}"
+        }
+    ]
+}

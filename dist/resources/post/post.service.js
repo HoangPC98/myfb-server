@@ -15,13 +15,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PostService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
+const comment_entity_1 = require("../../database/entities/comment.entity");
 const photo_entity_1 = require("../../database/entities/photo.entity");
 const post_entity_1 = require("../../database/entities/post.entity");
 const privacy_entity_1 = require("../../database/entities/privacy.entity");
+const reaction_entity_1 = require("../../database/entities/reaction.entity");
 const typeorm_2 = require("typeorm");
 let PostService = class PostService {
-    constructor(postRepo) {
+    constructor(postRepo, commentRepo, reactionRepo) {
         this.postRepo = postRepo;
+        this.commentRepo = commentRepo;
+        this.reactionRepo = reactionRepo;
     }
     async createNewPost(uid, createPostDto, photo) {
         const newPost = new post_entity_1.Post();
@@ -29,42 +33,43 @@ let PostService = class PostService {
         newPost.privacy_mode = privacy_entity_1.PrivacyMode.Public;
         newPost.text = createPostDto.text;
         if (!photo) {
-            newPost.id = Date.now();
             return await this.postRepo.save(newPost);
         }
-        newPost.id = +photo.filename.split('.')[0];
         const newPhoto = new photo_entity_1.Photo();
         newPhoto.photo_url = photo.path;
         newPhoto.photo_type = photo_entity_1.PhotoType.PostPhoto;
-        newPhoto.post_id = newPost.id;
         try {
             await (0, typeorm_2.getManager)().transaction(async (transactionManager) => {
-                await transactionManager.save(newPost);
+                const createPost = await transactionManager.save(newPost);
+                newPhoto.post_id = createPost.id;
                 await transactionManager.save(newPhoto);
             });
+            return {
+                message: 'ok',
+            };
         }
         catch (err) {
             console.error('error when save new post/photo', err);
             throw new common_1.InternalServerErrorException('error when save new post/photo');
         }
     }
-    findAll() {
-        return `This action returns all post`;
-    }
-    findOne(id) {
-        return `This action returns a #${id} post`;
-    }
-    update(id, updatePostDto) {
-        return `This action updates a #${id} post`;
-    }
-    remove(id) {
-        return `This action removes a #${id} post`;
+    async getAllPostByUserId(user_id) {
+        const postRecs = await this.postRepo.find({
+            where: { owner_id: user_id },
+            relations: ['Photos', 'Comments', 'Reactions'],
+        });
+        console.log('post reccccc', postRecs);
+        return postRecs;
     }
 };
 PostService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(post_entity_1.Post)),
-    __metadata("design:paramtypes", [typeorm_2.Repository])
+    __param(1, (0, typeorm_1.InjectRepository)(comment_entity_1.Comment)),
+    __param(2, (0, typeorm_1.InjectRepository)(reaction_entity_1.Reaction)),
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository,
+        typeorm_2.Repository])
 ], PostService);
 exports.PostService = PostService;
 //# sourceMappingURL=post.service.js.map

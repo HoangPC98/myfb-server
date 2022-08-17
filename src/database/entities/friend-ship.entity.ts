@@ -1,4 +1,11 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryColumn,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import CustomBaseEntity from './base-entity';
 import { User } from './user.entity';
 
@@ -6,22 +13,19 @@ export enum FriendShipStatus {
   Pending = 'pending',
   BeFriended = 'beFriended',
   Blocked = 'blocked',
+  RejectFriend = 'rejectFriend',
 }
 
 @Entity('friend_ships')
 export class FriendShip extends CustomBaseEntity {
-  @PrimaryColumn()
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-  @PrimaryColumn()
+  @Column()
   sender_uid: number;
 
-  @PrimaryColumn()
+  @Column()
   receiver_uid: number;
-
-  @ManyToOne(() => User, (user: User) => user.FriendShip)
-  @JoinColumn({ name: 'id' })
-  User: User;
 
   @Column({
     type: 'enum',
@@ -30,4 +34,12 @@ export class FriendShip extends CustomBaseEntity {
     nullable: true,
   })
   status: FriendShipStatus;
+
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'sender_uid' })
+  Sender: User;
+
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'receiver_uid' })
+  Receiver: User;
 }

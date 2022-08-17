@@ -18,10 +18,12 @@ const base_entity_1 = __importDefault(require("./base-entity"));
 const photo_entity_1 = require("./photo.entity");
 const privacy_entity_1 = require("./privacy.entity");
 const user_entity_1 = require("./user.entity");
+const comment_entity_1 = require("./comment.entity");
+const reaction_entity_1 = require("./reaction.entity");
 let Post = class Post extends base_entity_1.default {
 };
 __decorate([
-    (0, typeorm_1.PrimaryColumn)(),
+    (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
 ], Post.prototype, "id", void 0);
 __decorate([
@@ -45,6 +47,14 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => photo_entity_1.Photo, (photo) => photo.Post, { cascade: true }),
     __metadata("design:type", Array)
 ], Post.prototype, "Photos", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => comment_entity_1.Comment, (comment) => comment.Post, { cascade: true }),
+    __metadata("design:type", Array)
+], Post.prototype, "Comments", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => reaction_entity_1.Reaction, (reaction) => reaction.Post, { cascade: true }),
+    __metadata("design:type", Array)
+], Post.prototype, "Reactions", void 0);
 Post = __decorate([
     (0, typeorm_1.Entity)('posts')
 ], Post);

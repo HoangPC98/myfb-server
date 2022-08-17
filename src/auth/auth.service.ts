@@ -62,7 +62,8 @@ export class AuthService {
       );
       throw new UnauthorizedException();
     }
-    const foundExistingUser = await this.userRepository.findOne({
+    let foundExistingUser;
+    foundExistingUser = await this.userRepository.findOne({
       where: { email: email },
     });
 
@@ -86,16 +87,17 @@ export class AuthService {
 
       console.log('user....', newUser);
       const getNewUser = await this.userRepository.save(newUser);
+      foundExistingUser = getNewUser;
       userInfo = await this.userRepository.findOne({
         where: { id: getNewUser.id },
         relations: ['Profile'],
       });
       this.logger.log(`Create a new User with id = ${userInfo.id}`);
+    } else {
+      this.logger.log(
+        `user ${foundExistingUser.id} : ${foundExistingUser.given_name} has login`,
+      );
     }
-
-    this.logger.log(
-      `user ${foundExistingUser.id} : ${foundExistingUser.given_name} has login`,
-    );
 
     const checkUserLoginNewDevice = await this.loginSessionRepo.findOne({
       where: { user_id: foundExistingUser.id, uuid: uuid },

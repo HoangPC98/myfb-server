@@ -1,15 +1,12 @@
+import { EntityType, ReactionType } from 'src/types/enum-types/common.enum';
 import CustomBaseEntity from './base-entity';
+import { Post } from './post.entity';
 import { User } from './user.entity';
-export declare enum ReactionType {
-    Like = "like",
-    Love = "love",
-    Haha = "haha",
-    Sad = "Sad",
-    Angry = "Angry"
-}
 export declare class Reaction extends CustomBaseEntity {
-    subject_id: number;
-    user_id: number;
+    entity_id: number;
+    reactor_id: number;
     User: User;
+    entity_type: EntityType;
     reaction_type: ReactionType;
+    Post: Post;
 }

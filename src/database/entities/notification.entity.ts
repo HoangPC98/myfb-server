@@ -1,12 +1,7 @@
+import { EntityType, NotifyType } from 'src/types/enum-types/common.enum';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import CustomBaseEntity from './base-entity';
 import { NotificationReceive } from './notification-receive.entity';
-
-export enum EntityType {
-  FriendShip = 'FriendShip',
-  Reaction = 'Reaction',
-  Comment = 'Comment',
-}
 
 @Entity('notifications')
 export class Notifications extends CustomBaseEntity {
@@ -16,14 +11,21 @@ export class Notifications extends CustomBaseEntity {
   @Column({ nullable: true })
   entity_id: number;
 
-
   @Column({
     type: 'enum',
     enum: EntityType,
     default: null,
     nullable: true,
   })
-  type_entity: EntityType;
+  entity_type: EntityType;
+
+  @Column({
+    type: 'enum',
+    enum: NotifyType,
+    default: null,
+    nullable: true,
+  })
+  notify_type: NotifyType;
 
   @Column({ type: 'text' })
   data: string;

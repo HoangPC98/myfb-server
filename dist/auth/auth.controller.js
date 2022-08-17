@@ -24,7 +24,10 @@ let AuthController = class AuthController {
     }
     async loginGoogle(loginGoogleBody) {
         console.log('login ggoogle>>>>');
-        return await this.authService.loginGoogle(loginGoogleBody.ggToken, loginGoogleBody.uuid);
+        const data = await this.authService.loginGoogle(loginGoogleBody.ggToken, loginGoogleBody.uuid);
+        return {
+            response: data,
+        };
     }
     async logOut(user) {
         return await this.logOut(user);

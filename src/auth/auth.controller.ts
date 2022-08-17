@@ -12,10 +12,13 @@ export class AuthController {
   @Post('google-login')
   async loginGoogle(@Body() loginGoogleBody: LoginGoogleDto): Promise<any> {
     console.log('login ggoogle>>>>');
-    return await this.authService.loginGoogle(
+    const data = await this.authService.loginGoogle(
       loginGoogleBody.ggToken,
       loginGoogleBody.uuid,
     );
+    return {
+      response: data,
+    };
   }
 
   async logOut(@GetCurrentUser() user) {

@@ -1,5 +1,4 @@
 import CustomBaseEntity from './base-entity';
-import { FriendShip } from './friend-ship.entity';
 import { LoginSession } from './login-session.entity';
 import { NotificationReceive } from 'src/database/entities/notification-receive.entity';
 import { Post } from './post.entity';
@@ -29,5 +28,4 @@ export declare class User extends CustomBaseEntity {
     Posts: Post[];
     LoginSessions: LoginSession[];
     NotificationReceives: NotificationReceive[];
-    FriendShip: FriendShip[];
 }

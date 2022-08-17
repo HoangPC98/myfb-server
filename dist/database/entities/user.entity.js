@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = exports.Gender = exports.UserStatus = void 0;
 const typeorm_1 = require("typeorm");
 const base_entity_1 = __importDefault(require("./base-entity"));
-const friend_ship_entity_1 = require("./friend-ship.entity");
 const login_session_entity_1 = require("./login-session.entity");
 const notification_receive_entity_1 = require("./notification-receive.entity");
 const post_entity_1 = require("./post.entity");
@@ -94,10 +93,6 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => notification_receive_entity_1.NotificationReceive, (notificationReceive) => notificationReceive.User),
     __metadata("design:type", Array)
 ], User.prototype, "NotificationReceives", void 0);
-__decorate([
-    (0, typeorm_1.OneToMany)(() => friend_ship_entity_1.FriendShip, (friendship) => friendship.User),
-    __metadata("design:type", Array)
-], User.prototype, "FriendShip", void 0);
 User = __decorate([
     (0, typeorm_1.Entity)('users')
 ], User);

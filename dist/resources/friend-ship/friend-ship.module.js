@@ -10,12 +10,18 @@ exports.FriendShipModule = void 0;
 const common_1 = require("@nestjs/common");
 const friend_ship_service_1 = require("./friend-ship.service");
 const friend_ship_controller_1 = require("./friend-ship.controller");
+const friend_ship_entity_1 = require("../../database/entities/friend-ship.entity");
+const typeorm_1 = require("@nestjs/typeorm");
+const notification_module_1 = require("../notification/notification.module");
+const friend_ship_repository_1 = require("./friend-ship.repository");
+const user_entity_1 = require("../../database/entities/user.entity");
 let FriendShipModule = class FriendShipModule {
 };
 FriendShipModule = __decorate([
     (0, common_1.Module)({
+        imports: [typeorm_1.TypeOrmModule.forFeature([friend_ship_entity_1.FriendShip, user_entity_1.User]), notification_module_1.NotificationModule],
         controllers: [friend_ship_controller_1.FriendShipController],
-        providers: [friend_ship_service_1.FriendShipService],
+        providers: [friend_ship_service_1.FriendShipService, friend_ship_repository_1.FriendShipRepositoty],
     })
 ], FriendShipModule);
 exports.FriendShipModule = FriendShipModule;

@@ -77,7 +77,4 @@ export class User extends CustomBaseEntity {
     (notificationReceive: NotificationReceive) => notificationReceive.User,
   )
   NotificationReceives: NotificationReceive[];
-
-  @OneToMany(() => FriendShip, (friendship: FriendShip) => friendship.User)
-  FriendShip: FriendShip[];
 }

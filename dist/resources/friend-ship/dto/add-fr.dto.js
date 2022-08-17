@@ -22,6 +22,6 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsNumber)(),
     __metadata("design:type", Number)
-], AddFriendDto.prototype, "request_uid", void 0);
+], AddFriendDto.prototype, "sender_uid", void 0);
 exports.AddFriendDto = AddFriendDto;
 //# sourceMappingURL=add-fr.dto.js.map

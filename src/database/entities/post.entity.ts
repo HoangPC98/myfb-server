@@ -11,10 +11,12 @@ import CustomBaseEntity from './base-entity';
 import { Photo } from './photo.entity';
 import { PrivacyMode } from './privacy.entity';
 import { User } from './user.entity';
+import { Comment } from './comment.entity';
+import { Reaction } from './reaction.entity';
 
 @Entity('posts')
 export class Post extends CustomBaseEntity {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
   id!: number;
 
   @Column()
@@ -32,4 +34,10 @@ export class Post extends CustomBaseEntity {
 
   @OneToMany(() => Photo, (photo) => photo.Post, { cascade: true })
   Photos: Photo[];
+
+  @OneToMany(() => Comment, (comment) => comment.Post, { cascade: true })
+  Comments: Comment[];
+
+  @OneToMany(() => Reaction, (reaction) => reaction.Post, { cascade: true })
+  Reactions: Reaction[];
 }

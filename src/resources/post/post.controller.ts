@@ -22,7 +22,7 @@ import { GetCurrentUID } from 'src/auth/decorators/getUid.derator';
 
 const multerOption = {
   storage: diskStorage({
-    destination: './photo/posts',
+    destination: './public/photo/posts',
     filename: (req, file, cb) => {
       const suffix = extname(file.originalname);
       console.log('ext', suffix);
@@ -52,23 +52,11 @@ export class PostController {
     );
   }
 
-  @Get()
-  findAll() {
-    return this.postService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.postService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-    return this.postService.update(+id, updatePostDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.postService.remove(+id);
+  @Get('/all-for-one')
+  async getAllPostByUid(@GetCurrentUID() uid: number) {
+    const result = await this.postService.getAllPostByUserId(uid);
+    return {
+      response: result,
+    };
   }
 }

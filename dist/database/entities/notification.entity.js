@@ -12,16 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Notifications = exports.EntityType = void 0;
+exports.Notifications = void 0;
+const common_enum_1 = require("../../types/enum-types/common.enum");
 const typeorm_1 = require("typeorm");
 const base_entity_1 = __importDefault(require("./base-entity"));
 const notification_receive_entity_1 = require("./notification-receive.entity");
-var EntityType;
-(function (EntityType) {
-    EntityType["FriendShip"] = "FriendShip";
-    EntityType["Reaction"] = "Reaction";
-    EntityType["Comment"] = "Comment";
-})(EntityType = exports.EntityType || (exports.EntityType = {}));
 let Notifications = class Notifications extends base_entity_1.default {
 };
 __decorate([
@@ -35,12 +30,21 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)({
         type: 'enum',
-        enum: EntityType,
+        enum: common_enum_1.EntityType,
         default: null,
         nullable: true,
     }),
     __metadata("design:type", String)
-], Notifications.prototype, "type_entity", void 0);
+], Notifications.prototype, "entity_type", void 0);
+__decorate([
+    (0, typeorm_1.Column)({
+        type: 'enum',
+        enum: common_enum_1.NotifyType,
+        default: null,
+        nullable: true,
+    }),
+    __metadata("design:type", String)
+], Notifications.prototype, "notify_type", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: 'text' }),
     __metadata("design:type", String)

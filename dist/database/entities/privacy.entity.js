@@ -25,7 +25,7 @@ var PrivacyMode;
 let Privacy = class Privacy extends base_entity_1.default {
 };
 __decorate([
-    (0, typeorm_1.PrimaryGeneratedColumn)(),
+    (0, typeorm_1.PrimaryColumn)(),
     __metadata("design:type", Number)
 ], Privacy.prototype, "user_id", void 0);
 __decorate([

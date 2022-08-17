@@ -7,5 +7,5 @@ export class AddFriendDto {
 
   @IsOptional()
   @IsNumber()
-  request_uid: number;
+  sender_uid: number;
 }

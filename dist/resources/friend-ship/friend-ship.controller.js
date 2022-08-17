@@ -16,6 +16,7 @@ exports.FriendShipController = void 0;
 const common_1 = require("@nestjs/common");
 const getUid_derator_1 = require("../../auth/decorators/getUid.derator");
 const add_fr_dto_1 = require("./dto/add-fr.dto");
+const reply_request_dto_1 = require("./dto/reply-request.dto");
 const friend_ship_service_1 = require("./friend-ship.service");
 let FriendShipController = class FriendShipController {
     constructor(friendShipService) {
@@ -24,8 +25,8 @@ let FriendShipController = class FriendShipController {
     async addFriendRequest(sender_uid, addFriendDto) {
         return await this.friendShipService.addFriendRequest(addFriendDto);
     }
-    async replyFriendRequest(receiver_uid, request_id) {
-        return await this.friendShipService.replyFriendRequest(request_id, receiver_uid);
+    async replyFriendRequest(this_uid, replyFriendDto) {
+        return await this.friendShipService.replyFriendRequest(this_uid, replyFriendDto.request_id, replyFriendDto.reply_option);
     }
     async cancelFriendRequest(sender_uid, request_id) {
         return await this.friendShipService.cancelFriendRequest(request_id, sender_uid);
@@ -40,11 +41,11 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], FriendShipController.prototype, "addFriendRequest", null);
 __decorate([
-    (0, common_1.Patch)('request-acpt/:request_id'),
+    (0, common_1.Patch)('request-reply'),
     __param(0, (0, getUid_derator_1.GetCurrentUID)()),
-    __param(1, (0, common_1.Param)()),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Number]),
+    __metadata("design:paramtypes", [Number, reply_request_dto_1.ReplyRequestDto]),
     __metadata("design:returntype", Promise)
 ], FriendShipController.prototype, "replyFriendRequest", null);
 __decorate([

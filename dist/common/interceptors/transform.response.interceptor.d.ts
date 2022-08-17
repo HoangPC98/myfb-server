@@ -2,7 +2,6 @@ import { NestInterceptor, ExecutionContext, CallHandler, StreamableFile } from '
 import { Observable } from 'rxjs';
 export interface Response<T> {
     statusCode: number;
-    message: string;
     data: T;
 }
 export declare class TransformResponseInterceptor<T> implements NestInterceptor<T, Response<T> | StreamableFile> {

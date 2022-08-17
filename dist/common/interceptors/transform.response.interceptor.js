@@ -17,8 +17,7 @@ let TransformResponseInterceptor = class TransformResponseInterceptor {
             }
             return {
                 statusCode: context.switchToHttp().getResponse().statusCode,
-                message: data.message,
-                data: data.result,
+                data: data.response,
             };
         }));
     }

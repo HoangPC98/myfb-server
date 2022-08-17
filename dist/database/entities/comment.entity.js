@@ -13,19 +13,33 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Comment = void 0;
+const common_enum_1 = require("../../types/enum-types/common.enum");
 const typeorm_1 = require("typeorm");
 const base_entity_1 = __importDefault(require("./base-entity"));
+const post_entity_1 = require("./post.entity");
 const user_entity_1 = require("./user.entity");
 let Comment = class Comment extends base_entity_1.default {
 };
 __decorate([
-    (0, typeorm_1.PrimaryColumn)(),
+    (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
-], Comment.prototype, "subject_id", void 0);
+], Comment.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.PrimaryColumn)(),
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", Number)
+], Comment.prototype, "entity_id", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
     __metadata("design:type", Number)
 ], Comment.prototype, "user_id", void 0);
+__decorate([
+    (0, typeorm_1.Column)({
+        type: 'enum',
+        enum: common_enum_1.EntityType,
+        nullable: false,
+    }),
+    __metadata("design:type", String)
+], Comment.prototype, "entity_type", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => user_entity_1.User, { onDelete: 'CASCADE' }),
     (0, typeorm_1.JoinColumn)({ name: 'user_id' }),
@@ -35,6 +49,11 @@ __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], Comment.prototype, "text", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => post_entity_1.Post, (post) => post.Comments, { onDelete: 'CASCADE' }),
+    (0, typeorm_1.JoinColumn)({ name: 'entity_id' }),
+    __metadata("design:type", post_entity_1.Post)
+], Comment.prototype, "Post", void 0);
 Comment = __decorate([
     (0, typeorm_1.Entity)('comments')
 ], Comment);

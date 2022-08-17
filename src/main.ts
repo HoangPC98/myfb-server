@@ -5,6 +5,7 @@ import { Logger, VersioningType, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TransformResponseInterceptor } from './common/interceptors/transform.response.interceptor';
 import * as admin from 'firebase-admin';
+import firebaseConfig from './resources/notification/config/fcm.config';
 // import firebaseConfig from './notification/firebaseConfig';
 
 async function bootstrap() {
@@ -19,8 +20,6 @@ async function bootstrap() {
     type: VersioningType.URI,
   });
 
-  app.setGlobalPrefix('v1');
-
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -33,8 +32,7 @@ async function bootstrap() {
 
   app.useGlobalInterceptors(new TransformResponseInterceptor());
 
-
-  // admin.initializeApp({ credential: admin.credential.cert(firebaseConfig) });
+  admin.initializeApp({ credential: admin.credential.cert(firebaseConfig) });
 
   const port = configService.get<number>('port');
   await app.listen(port);

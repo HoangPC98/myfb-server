@@ -51,7 +51,8 @@ let AuthService = AuthService_1 = class AuthService {
             this.logger.error(` domain ${domain} not authorized or email ${email} not verified`);
             throw new common_1.UnauthorizedException();
         }
-        const foundExistingUser = await this.userRepository.findOne({
+        let foundExistingUser;
+        foundExistingUser = await this.userRepository.findOne({
             where: { email: email },
         });
         let userInfo = foundExistingUser;
@@ -71,13 +72,16 @@ let AuthService = AuthService_1 = class AuthService {
             newUser.avatar_url = picture;
             console.log('user....', newUser);
             const getNewUser = await this.userRepository.save(newUser);
+            foundExistingUser = getNewUser;
             userInfo = await this.userRepository.findOne({
                 where: { id: getNewUser.id },
                 relations: ['Profile'],
             });
             this.logger.log(`Create a new User with id = ${userInfo.id}`);
         }
-        this.logger.log(`user ${foundExistingUser.id} : ${foundExistingUser.given_name} has login`);
+        else {
+            this.logger.log(`user ${foundExistingUser.id} : ${foundExistingUser.given_name} has login`);
+        }
         const checkUserLoginNewDevice = await this.loginSessionRepo.findOne({
             where: { user_id: foundExistingUser.id, uuid: uuid },
             withDeleted: true,

@@ -3,12 +3,14 @@ import { User } from './user.entity';
 export declare enum FriendShipStatus {
     Pending = "pending",
     BeFriended = "beFriended",
-    Blocked = "blocked"
+    Blocked = "blocked",
+    RejectFriend = "rejectFriend"
 }
 export declare class FriendShip extends CustomBaseEntity {
-    id: string;
+    id: number;
     sender_uid: number;
     receiver_uid: number;
-    User: User;
     status: FriendShipStatus;
+    Sender: User;
+    Receiver: User;
 }

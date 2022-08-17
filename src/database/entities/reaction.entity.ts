@@ -1,37 +1,27 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-  PrimaryColumn,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { EntityType, ReactionType } from 'src/types/enum-types/common.enum';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import CustomBaseEntity from './base-entity';
-import { Photo } from './photo.entity';
 import { Post } from './post.entity';
-import { PrivacyMode } from './privacy.entity';
 import { User } from './user.entity';
-
-export enum ReactionType {
-  Like = 'like',
-  Love = 'love',
-  Haha = 'haha',
-  Sad = 'Sad',
-  Angry = 'Angry',
-}
 
 @Entity('reactions')
 export class Reaction extends CustomBaseEntity {
   @PrimaryColumn()
-  subject_id!: number;
+  entity_id!: number;
 
   @PrimaryColumn()
-  user_id!: number;
+  reactor_id!: number;
 
   @ManyToOne(() => User, (user) => user.Posts, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'user_id' })
+  @JoinColumn({ name: 'reactor_id' })
   User: User;
+
+  @Column({
+    type: 'enum',
+    enum: EntityType,
+    nullable: false,
+  })
+  entity_type!: EntityType;
 
   @Column({
     type: 'enum',
@@ -40,4 +30,8 @@ export class Reaction extends CustomBaseEntity {
     nullable: true,
   })
   reaction_type: ReactionType;
+
+  @ManyToOne(() => Post, (post) => post.Reactions, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'entity_id' })
+  Post: Post;
 }
