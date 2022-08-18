@@ -1,0 +1,71 @@
+<link rel="stylesheet" href="/css/components/home-post-box.css">
+
+<div class="overlay post-new hide">
+    <div class="overplay-body">
+
+        <div class="post-box">
+            <div class="post-box__head">
+                <h3 class="post-box__head-text">
+                    Tạo bài viết
+                </h3>
+                <span class="post-box__head-close close-box" id="close-post-box">
+                    <i class="fas fa-times"></i>
+                </span>
+            </div>
+            <div class="post-box__main">
+                <div class="post-box__info">
+                    <img src="" alt="" class="post-box__avatar avatar-img-logined" id="avatar-postnew-overlay">
+                    <div class="post-box__info-info">
+                        <p class="post-box__info-name user-name-text">
+
+                        </p>
+                        <div class="post-box__info-object">
+                            <i class="fas fa-globe-europe"></i> Công khai
+                        </div>
+                    </div>
+                </div>
+
+                <form id="form-post-new" class="form-submit-new-post" action="http://localhost:5000/posts/new" method="post" enctype="multipart/form-data">
+                    <div class="post-box__content">
+                        <textarea id="post-content" name="content" placeholder="Bạn đang nghĩ gì thế ?" type="text" class="post-box__content-textarea" style="min-height: 40px;"></textarea>
+                        <input type="hidden" class="uid-post" name="uid" value="">
+                        <input type="hidden" class="date-time-post" name="date_time_post" value="">
+                        <span class="post-box__head-close" id="cancel-upload-img" style="display: none; font-size:23px; width:30px ; height:30px; position: relative; bottom:-33px;">
+                            <i class="fas fa-times"></i>
+                        </span>
+                        <div class="post-box__content-img">
+                            <img class="img-preview" src="" width="100%" alt="">
+
+                        </div>
+                    </div>
+                    <div class="post-box__add">
+                        <div class="post-box__add-head">
+                            Thêm vào bài viết
+                        </div>
+                        <div class="post-box__add-more">
+                            <div class="post-box__add-icon uploadfile">
+                                <input id="upload-photo" type="file" class="input-upload" name="file" id="image" hidden="hidden">
+                                <i style="color: #45bd62;" class="fas fa-images"></i>
+                            </div>
+                            <div class="post-box__add-icon">
+                                <i style="color: #f7b928;" class="fas fa-laugh"></i>
+                            </div>
+                            <div class="post-box__add-icon">
+                                <i style="color: #f5533d;" class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="post-box__add-icon">
+                                <i style="color: #717880;" class="fas fa-ellipsis-h"></i>
+                            </div>
+                            <!-- <button type="submit" class="btn-submit-file">SUBMIT</button> -->
+                        </div>
+                    </div>
+                    <button type="button" id="submit-post" class="post-box__btn btn-disable">Đăng</button>
+
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script type="module" src="/js/create-post.js"></script>

@@ -1,0 +1,121 @@
+<link rel="stylesheet" href="/css/components/home-post-box.css">
+
+<div class="overplay edit-post">
+    <div class="overplay-body">
+
+        <div class="post-box">
+            <div class="post-box__head">
+                <h3 class="post-box__head-text">
+                    Chỉnh sửa bài viết
+                </h3>
+                <span class="post-box__head-close close-box" id="close-post-box">
+                    <i class="fas fa-times"></i>
+                </span>
+            </div>
+            <div class="post-box__main">
+                <div class="post-box__info">
+                    <img src="" alt="" class="post-box__avatar avatar-img-logined" id="avatar-postnew-overlay">
+                    <div class="post-box__info-info">
+                        <p class="post-box__info-name user-name-text">
+
+                        </p>
+                        <div class="post-box__info-object">
+                            <i class="fas fa-globe-europe"></i> Công khai
+                        </div>
+                    </div>
+                </div>
+
+                <form class="form-submit-edit-post" action="" method="post" enctype="multipart/form-data">
+                    <div class="post-box__content">
+                        <textarea name="content" type="text" class="post-box__content-textarea" style="min-height: 40px;"></textarea>
+                        <input type="hidden" class="uid-post" name="uid" value="">
+                        <input type="hidden" class="date-time-post" name="date_time_post" value="">
+                        <span class="post-box__head-close cancel-upload-img" id="cancel-upload-img__edit" style="display: none; font-size:23px; width:30px ; height:30px; position: relative; bottom:-33px;">
+                            <i class="fas fa-times"></i>
+                        </span>
+                        <div class="post-box__content-img">
+                            <img class="img-preview" src="" width="100%" alt="">
+
+                        </div>
+                    </div>
+                    <div class="post-box__add">
+                        <div class="post-box__add-head">
+                            Thêm vào bài viết
+                        </div>
+                        <div class="post-box__add-more">
+                            <div class="post-box__add-icon uploadfile">
+                                <input type="file" class="input-upload" name="editimg" id="image" hidden="hidden">
+                                <i style="color: #45bd62;" class="fas fa-images"></i>
+                            </div>
+                            <div class="post-box__add-icon">
+                                <i style="color: #f7b928;" class="fas fa-laugh"></i>
+                            </div>
+                            <div class="post-box__add-icon">
+                                <i style="color: #f5533d;" class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="post-box__add-icon">
+                                <i style="color: #717880;" class="fas fa-ellipsis-h"></i>
+                            </div>
+                            <!-- <button type="submit" class="btn-submit-file">SUBMIT</button> -->
+                        </div>
+                    </div>
+                    <button type="submit" class="post-box__btn btn-disable">Cập nhật</button>
+
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // let this_overlay = document.querySelector('.overplay.edit-post')
+
+    // this_overlay.querySelector('#close-post-box').onclick = () => {
+    //     this_overlay.querySelector('.overplay.edit-post').style.display = 'none';
+    // }
+    // this_overlay.querySelector('.post-box__content-textarea').oninput = function(e) {
+    //         if (e.target.value != '') {
+    //             console.log('ok nha')
+    //             this_overlay.querySelector('.post-box__btn').classList.add('btn-active');
+    //         } else {
+    //             this_overlay.querySelector('.post-box__btn').classList.remove('btn-active')
+    //         }
+    //     }
+    //     // Upload FIle
+    // this_overlay.querySelector('.post-box__add-icon.uploadfile').onclick = () => {
+    //         console.log('hahahaha')
+    //         this_overlay.querySelector('.input-upload').click()
+    //     }
+    //     // this_overlay.querySelector('.overplay edit-post').style.display = 'none'
+    // this_overlay.querySelector('.input-upload').onchange = function(e) {
+    //     if (e.target.files.length > 0) {
+    //         let src = URL.createObjectURL(e.target.files[0])
+    //         this_overlay.querySelector('.img-preview').src = src
+    //         this_overlay.querySelector('.img-preview').style.display = 'block'
+    //         this_overlay.querySelector('#cancel-upload-img__edit').style.display = 'flex'
+    //         console.log(this.value)
+    //     }
+    // }
+
+    // if (this_overlay.querySelector('.img-preview').src !== '')
+    //     this_overlay.querySelector('#cancel-upload-img__edit').style.display = 'flex'
+    // else
+    //     this_overlay.querySelector('#cancel-upload-img__edit').style.display = 'none'
+
+
+
+    // this_overlay.querySelector('#cancel-upload-img__edit').onclick = function() {
+    //     console.log('AAAAAAAAAAAAAAAAAAA')
+    //     this_overlay.querySelector('.input-upload').value = ''
+    //     this_overlay.querySelector('.img-preview').style.display = 'none'
+    //     this.style.display = 'none'
+    // }
+
+    // this_overlay.querySelector('.post-box__btn').onclick = function() {
+    //     this_overlay.querySelector('.uid-post').value = Json_cookie.userId
+    //     this_overlay.querySelector('.date-time-post').value = Date.now()
+    //     this_overlay.querySelector('.form-submit-new-post').submit()
+    //     this_overlay.querySelector('.overplay.edit-post').style.display = 'none'
+    // }
+</script>

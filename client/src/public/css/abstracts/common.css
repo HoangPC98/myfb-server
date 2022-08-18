@@ -1,0 +1,12 @@
+.flex-row {
+    display: flex;
+    flex-direction: row;
+}
+
+.algin-center {
+    margin: 0 auto;
+}
+
+.hide {
+    display: none;
+}

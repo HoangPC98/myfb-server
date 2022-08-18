@@ -1,0 +1,31 @@
+<div class="container-posts align-center">
+    <div class="posts__new-post">
+        <img src="" alt="" class="posts__new-post-img nav-wall avatar-img-logined" id="avatar-postnew">
+        <button class="new-post-btn posts__new-post-btn">
+            Bạn đang nghĩ gì thế ?
+            
+        </button>
+    </div>
+    <ul class="post__action">
+        <li class="post__action-item">
+            <i class="fas fa-video post__action-item-icon"></i>
+            <span class="post__action-item-text">Video trực tiếp</span>
+        </li>
+        <li class="post__action-item uploadfile single">
+            <i class="fas fa-images post__action-item-icon"></i>
+            <span class="post__action-item-text">Ảnh/Video</span>
+        </li>
+        <li class="post__action-item">
+            <i class="far fa-laugh post__action-item-icon"></i>
+            <span class="post__action-item-text">Cảm xúc/Hoạt động</span>
+        </li>
+    </ul>
+</div>
+
+
+<script>
+    document.querySelector('.new-post-btn.posts__new-post-btn').onclick = () => {
+        console.log('OVERLAY')
+        document.querySelector('.post-new.overlay').style = "display: block;";
+    }
+</script>

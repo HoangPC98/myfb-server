@@ -1,0 +1,345 @@
+<link rel="stylesheet" href="/css/components/header.css">
+
+<header class="header">
+    <div class="header-grid">
+        <div class="header-left">
+            <a href="/home">
+                <div class="header-left__logo">
+                    <i class="fab fa-facebook header-left__icon-logo"></i>
+                </div>
+            </a>
+            <div class="header-left__search">
+                <div class="header-left__search-icon">
+                    <i class="fal fa-search"></i>
+                </div>
+                <input type="text" id="search-input" class="header-left__search-input" placeholder="Tìm kiếm trên Facebook">
+
+            </div>
+        </div>
+
+        <ul class="header-main">
+            <li class="header-main__item home-btn active nav-home">
+                <i class="fas fa-home"></i>
+                <span class="header-main__item-title">Trang chủ</span>
+            </li>
+            <li class="header-main__item">
+                <i class="fas fa-user-friends"></i>
+                <span class="header-main__item-title">Nhóm</span>
+            </li>
+            <li class="header-main__item">
+                <i class="fas fa-gamepad"></i>
+                <span class="header-main__item-title">Trò chơi</span>
+            </li>
+            <li class="header-main__item nav-left-layout">
+                <i class="fas fa-bars"></i>
+                <span class="header-main__item-title">Khác</span>
+            </li>
+        </ul>
+
+        <div class="header-switch">
+
+            <div class="header-switch__box">
+                <div style="color: rgba(235, 235, 235, 0.842)" class="header-switch-icon switch-moon">
+                    <i class="fas fa-moon"></i>
+                </div>
+                <div style="color: rgb(226, 226, 116)" class="header-switch-icon switch-sun">
+                    <i class="fas fa-sun"></i>
+                </div>
+            </div>
+
+        </div>
+
+        <ul class="header-right">
+            <li class="header-right__profile nav-wall">
+                <a href="/profile/me" class="link-profile a-non-decor flex-roww">
+                    <img src="https://thumbs.dreamstime.com/b/default-avatar-profile-vector-user-profile-default-avatar-profile-vector-user-profile-profile-179376714.jpg" class="header-profile__img avatar-img-logined" id="header-avatar">
+                    <span id="header-username" class="header-profile__name user-name-text-logined "></span>
+                </a>
+
+            </li>
+            <li class="header-right__item plus">
+                <i class="fas fa-plus header-right__item-plus"></i>
+                <div class="header-right__item-more">
+                    <h2 class="header-right__item-more-head">
+                        Tạo
+                    </h2>
+                    <ul class="header-right__item-more-list">
+                        <div>
+                            <li class="header-right__item-more-item">
+                                <div class="header-right__item-more-item__icon">
+                                    <i class="fas fa-edit"></i>
+                                </div>
+                                <div class="header-right__item-more-item__content">
+                                    <div class="header-right__item-more__head">
+                                        Đăng
+                                    </div>
+                                    <div class="header-right__item-more-item-more__note">
+                                        Chia sẻ bài viết trên Bảng tin.
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="header-right__item-more-item">
+                                <div class="header-right__item-more-item__icon">
+                                    <i class="fas fa-book-open"></i>
+                                </div>
+                                <div class="header-right__item-more-item__content">
+                                    <div class="header-right__item-more__head">
+                                        Tin
+                                    </div>
+                                    <div class="header-right__item-more-item-more__note">
+                                        Bạn có thể chia sẻ hoặc viết gì đó.
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="header-right__item-more-item">
+                                <div class="header-right__item-more-item__icon">
+                                    <i class="fas fa-video"></i>
+                                </div>
+                                <div class="header-right__item-more-item__content">
+                                    <div class="header-right__item-more__head">
+                                        Phòng họp mặt
+                                    </div>
+                                    <div class="header-right__item-more-item-more__note">
+                                        Chat video với bất kì ai trên hoặc bên ngoài Facebook, không giới hạn thời gian.
+                                    </div>
+                                </div>
+                            </li>
+                        </div>
+                        <li class="header-right__item-more-item">
+                            <div class="header-right__item-more-item__icon">
+                                <i class="fas fa-font-awesome-flag"></i>
+                            </div>
+                            <div class="header-right__item-more-item__content">
+                                <div class="header-right__item-more__head">
+                                    Trang
+                                </div>
+                                <div class="header-right__item-more-item-more__note">
+                                    Kết nối, chia sẻ với khách hàng hoặc fan
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+            <li class="header-right__item">
+                <i class="fab fa-facebook-messenger header-right__item-mess"></i>
+                <div class="header-right__item-more header-right__mess">
+                    <div class="mess-heading">
+                        <h2 class="mess-heading__text">
+                            Messenger
+                        </h2>
+                        <div class="mess-heading__right">
+                            <div class="mess-heading__right-icon">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mess-search">
+                        <div class="mess-search__icon">
+                            <i class="far fa-address-card"></i>
+                        </div>
+                        <input class="mess-search__input" type="text" placeholder="Tìm kiếm trên Messenger">
+                    </div>
+                    <ul class="mess-list">
+                        <li class="mess-item">
+                            <div>
+                                <img src="./assets/img/Home/avatar-mess-2.jpg" alt="" class="mess-item__avatar">
+                            </div>
+                            <div class="mess-list__info">
+                                <div class="mess-item__info-name">
+                                    Group thông báo IT02
+                                </div>
+                                <div class="mess-item__info-text">
+                                    Trịnh: G9
+                                    <i class="fas fa-circle"></i>
+                                    <span>
+                                        8 giờ
+                                    </span>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="mess-item">
+                            <div class="mess-item__active">
+                                <img src="./assets/img/Home/avatar-mess-3.jpg" alt="" class="mess-item__avatar">
+                            </div>
+                            <div class="mess-list__info">
+                                <div class="mess-item__info-name">
+                                    Lê Hồ
+                                </div>
+                                <div class="mess-item__info-text">
+                                    Bạn đã gửi 1 video
+                                    <i class="fas fa-circle"></i>
+                                    <span>
+                                        10 giờ
+                                    </span>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                    <form class="mess-open-Mess" action="./mess.html">
+                        <button class="mess-open-Mess__btn">Xem tất cả trong Messenger</button>
+                    </form>
+                </div>
+            </li>
+            <li class="header-right__item">
+                <span class="header-right__item-count">
+                    1
+                </span>
+                <i class="fas fa-bell header-right__item-notify"></i>
+                <div class="header-right__item-more header-right__notify">
+                    <div class="notify-heading">
+                        <h2 class="notify-heading__text">
+                            Thông báo
+                        </h2>
+                        <div class="notify-heading__right">
+                            <div class="notify-heading__right-icon">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="notify-content">
+                        <div class="notify-content__new">
+                            <div class="notify-content__new-head">
+                                <p class="notify-content__head-text new-notify__title">
+                                    Mới
+                                </p>
+                                <ul class="notify-content__new-list">
+
+                                </ul>
+                                <p class="notify-content__head-text">
+                                    Trước đó
+                                </p>
+                                <ul class="notify-content__before-list">
+
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li class="header-right__item caret-down-btn">
+                <i class="fas fa-caret-down header-right__item-caret-down"></i>
+                <div class="header-right__item-more header-right__setting">
+                    <div class="setting-head nav-wall">
+                        <img id="header-me-dropdown" src="" alt="" class="setting-head__avatar avatar-img-logined">
+                        <div class="setting-head__content">
+                            <p class="setting-head__content-name full-name">
+                                Default UserName
+                            </p>
+                            <p class="setting-head__content-note">
+                                Xem trang cá nhân của bạn
+                            </p>
+                        </div>
+                    </div>
+                    <div class="setting__respond">
+                        <div>
+                            <div class="setting__respond-img">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </div>
+                            <div class="setting__respond-content">
+                                <p class="setting__respond-title">
+                                    Đóng góp ý kiến
+                                </p>
+                                <p class="setting__respond-note">
+                                    Góp phần cải thiện Facebook mới.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <ul class="setting__list">
+                        <li class="setting__item">
+                            <div class="setting__item-img">
+                                <i class="fas fa-cogs"></i>
+                            </div>
+                            <p class="setting__item-content">
+                                Cài đặt & quyền riêng tư
+                            </p>
+                            <i class="fas fa-chevron-right"></i>
+                        </li>
+                        <li class="setting__item">
+                            <div class="setting__item-img">
+                                <i class="fas fa-question-circle"></i>
+                            </div>
+                            <p class="setting__item-content">
+                                Trợ giúp & hỗ trợ
+                            </p>
+                            <i class="fas fa-chevron-right"></i>
+                        </li>
+                        <li class="setting__item">
+                            <div class="setting__item-img">
+                                <i class="fas fa-moon"></i>
+                            </div>
+                            <p class="setting__item-content">
+                                Màn hình & trợ năng
+                            </p>
+                            <i class="fas fa-chevron-right"></i>
+                        </li>
+                        <li class="setting__item nav-logout">
+                            <a>
+                                <div class="setting__item-img">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                </div>
+                                <p class="setting__item-content">
+                                    Đăng xuất
+                                </p>
+                            </a>
+                        </li>
+                    </ul>
+                    <footer class="setting__footer">
+                        <span>
+                            Quyền riêng tư
+                        </span> ·
+                        <span>
+                            Điều khoản
+                        </span> ·
+                        <span>
+                            Quảng cáo
+                        </span> ·
+                        <span>
+                            Cookie
+                        </span> ·
+                        <span>
+                            Chính sách
+                        </span> · Facebook © 2021
+                    </footer>
+                </div>
+            </li>
+        </ul>
+    </div>
+</header>
+<script>
+    // Click to Caret-down : show logout button
+
+    $('.header-right__item').click(function() {
+            console.log('LOGUT..........')
+            if (this.classList.contains('active')) {
+                this.classList.remove('active')
+            } else {
+                this.classList.add('active')
+
+            }
+        })
+        // document.querySelector('.header-right__item-more.header-right__setting').style.display = 'flex'
+        // $('.setting-head__content-name.full-name').html(Json_cookie.userName)
+        // document.querySelector('.setting-head__avatar').src = Json_cookie.avatar
+        // $('.setting__item.nav-logout').click(function() {
+        //     function delete_cookie(name) {
+        //         document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        //     }
+        //     delete_cookie('user_logined')
+        //     window.location.href = '/'
+        //     console.log('JSON COKKIE DELETED 2', Json_cookie)
+        // })
+
+    // Switch Mode button
+    // $('.header-switch__box').click(function() {
+    //     if (this.classList.contains('dark')) {
+    //         this.classList.remove('dark')
+    //         document.querySelector('.app').classList.remove('dark')
+    //     } else {
+    //         this.classList.add('dark')
+    //         document.querySelector('.app').classList.add('dark')
+
+    //     }
+    // })
+</script>

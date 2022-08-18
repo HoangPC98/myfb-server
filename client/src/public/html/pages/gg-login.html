@@ -1,0 +1,64 @@
+<html>
+
+<body>
+    <div id="buttonDiv"></div>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script>
+        const serverURL = 'http://localhost:5000'
+
+        window.onload = function() {
+            google.accounts.id.initialize({
+                client_id: "97974203957-gl8vbkfau46g175k6neoc588lfc40i5a.apps.googleusercontent.com",
+                callback: handleCredentialResponse
+            });
+            google.accounts.id.renderButton(
+                document.getElementById("buttonDiv"), {
+                    theme: "outline",
+                    size: "large"
+                } // customization attributes
+            );
+            google.accounts.id.prompt(); // also display the One Tap dialog
+        }
+
+        async function handleCredentialResponse(response) {
+            console.log("Encoded JWT ID token: " + response.credential);
+            const ggToken = response.credential
+            await LoginToServer(ggToken);
+
+        }
+
+
+        function LoginToServer(gg_token) {
+            let option = {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    ggToken: gg_token,
+                    uuid: '1237474382'
+                }),
+            };
+            fetch(`${serverURL}/auth/google-login`, option)
+                .then((response) => {
+                    return response.json();
+                })
+                .then((result) => {
+                    console.log('data...', result);
+                    // localStorage.setItem('accessToken', result['accessToken']);
+                    // localStorage.setItem('refreshToken', result['refreshToken']);
+                    document.cookie = `access_token=${result['accessToken']}`
+                    document.cookie = `refresh_token=${result['accessToken']}`
+
+                    window.location.href = '/home'
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                });
+        }
+    </script>
+</body>
+<script>
+</script>
+
+</html>
