@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import CustomBaseEntity from './base-entity';
 import { Post } from './post.entity';
+import { User } from './user.entity';
 
 export enum PhotoType {
   Avatar = 'avatar',
@@ -22,6 +23,13 @@ export class Photo extends CustomBaseEntity {
 
   @Column()
   post_id!: number;
+
+  @Column()
+  owner_id!: number;
+
+  @ManyToOne(() => User, (user) => user.Photos, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'owner_id' })
+  Owner: User;
 
   @ManyToOne(() => Post, (post) => post.Photos, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'post_id' })

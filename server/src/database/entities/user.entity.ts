@@ -14,6 +14,7 @@ import { NotificationReceive } from 'src/database/entities/notification-receive.
 import { Post } from './post.entity';
 import { Privacy } from './privacy.entity';
 import { Profile } from './profile.entity';
+import { Photo } from './photo.entity';
 
 export enum UserStatus {
   Active = 'active',
@@ -68,6 +69,9 @@ export class User extends CustomBaseEntity {
 
   @OneToMany(() => Post, (post) => post.Owner, { cascade: true })
   Posts: Post[];
+
+  @OneToMany(() => Photo, (photo) => photo.Owner, { cascade: true })
+  Photos: Photo[];
 
   @OneToMany(() => LoginSession, (loginSession) => loginSession.User)
   LoginSessions: LoginSession[];

@@ -19,7 +19,6 @@ export class FriendShipService {
   constructor(
     @InjectRepository(FriendShip)
     private readonly friendShipRepo: Repository<FriendShip>,
-    private readonly notificationService: NotificationService,
     private readonly friendshipRepository: FriendShipRepositoty,
   ) {}
   private readonly notFoundAddFrErrMsg = 'Not Found Add Friend Request';
@@ -44,13 +43,13 @@ export class FriendShipService {
 
       // push notification
 
-      this.notificationService.sendNotificationFromOneToOne(
-        addFriendDto.sender_uid,
-        addFriendDto.receiver_uid,
-        createdFriendShip.id,
-        NotifyType.AddFriendRequest,
-        EntityType.FriendShip,
-      );
+      // this.notificationService.sendNotificationFromOneToOne(
+      //   addFriendDto.sender_uid,
+      //   addFriendDto.receiver_uid,
+      //   createdFriendShip.id,
+      //   NotifyType.AddFriendRequest,
+      //   EntityType.FriendShip,
+      // );
       return {
         message: 'ok',
       };
@@ -82,14 +81,14 @@ export class FriendShipService {
       const receiver_uid = thisRequest.sender_uid;
 
       const message = `${thisRequest.Receiver.given_name} has accept your friend request`;
-      this.notificationService.sendNotificationFromOneToOne(
-        sender_uid,
-        receiver_uid,
-        thisRequest.id,
-        NotifyType.AcceptFriendReq,
-        EntityType.FriendShip,
-        message,
-      );
+      // this.notificationService.sendNotificationFromOneToOne(
+      //   sender_uid,
+      //   receiver_uid,
+      //   thisRequest.id,
+      //   NotifyType.AcceptFriendReq,
+      //   EntityType.FriendShip,
+      //   message,
+      // );
     } else {
       thisRequest.status = FriendShipStatus.RejectFriend;
     }

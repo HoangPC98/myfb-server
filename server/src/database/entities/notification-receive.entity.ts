@@ -8,15 +8,15 @@ export class NotificationReceive extends CustomBaseEntity {
   @PrimaryColumn()
   notification_id: number;
 
+  @PrimaryColumn()
+  owner_id: number;
+
   @ManyToOne(
     () => Notifications,
     (notification) => notification.NotificationReceives,
   )
   @JoinColumn({ name: 'notification_id' })
   Notification: Notifications;
-
-  @PrimaryColumn()
-  user_id: number;
 
   @Column({ type: 'boolean', default: false })
   is_read: boolean;

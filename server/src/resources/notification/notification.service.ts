@@ -26,7 +26,7 @@ export class NotificationService {
       receiver_uid,
     );
 
-    console.log('tokens', receiver_fcm_tokens);
+    console.log('tokens receiver', receiver_uid);
 
     // get SenderName
 
@@ -34,8 +34,12 @@ export class NotificationService {
     const sender_name = sender.given_name;
     console.log(sender_name);
 
+    if (message) {
+      message = message.replace('$username', sender_name);
+    }
+
     if (message === undefined)
-      message = this.composeMessage(sender_name, notify_type);
+      message = this.composeMessage(sender_name, notify_type, entity_type);
     console.log('notification msg', message);
 
     // save to DB
@@ -63,9 +67,28 @@ export class NotificationService {
     await this.pushNotifyToMultiDevices(pushNotifyObject);
   }
 
-  private composeMessage(from_username: string, notify_type: NotifyType) {
-    const notify_msg = `You have received  ${notify_type} from ${from_username}`;
-    return notify_msg;
+  private composeMessage(
+    from_username: string,
+    notify_type: NotifyType,
+    entity_type: EntityType,
+  ) {
+    let message = '';
+
+    switch (notify_type) {
+      case NotifyType.AddFriendRequest:
+        message = `You have received  ${notify_type} from ${from_username}`;
+        break;
+      case NotifyType.AcceptFriendReq:
+        message = `${from_username} has ${notify_type} your friend request`;
+        break;
+      case NotifyType.HasComment:
+        message =
+          entity_type === EntityType.Comment
+            ? `${from_username} has reply your ${entity_type}`
+            : `${from_username} ${notify_type} your ${entity_type}`;
+        break;
+    }
+    return message;
   }
 
   private async pushNotifyToMultiDevices(

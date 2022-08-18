@@ -8,9 +8,9 @@ export enum EntityType {
 
 export enum NotifyType {
   AddFriendRequest = 'add friend request',
-  AcceptFriendReq = 'accept frinend Request',
-  HasReact = 'has comment',
-  HasComment = 'has react',
+  AcceptFriendReq = 'accept',
+  HasReact = 'has react',
+  HasComment = 'has comment',
 }
 
 export enum ReplyAddFrRequest {

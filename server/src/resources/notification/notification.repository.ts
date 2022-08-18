@@ -26,6 +26,17 @@ export class NotificationRepositoty {
     return await this.userRepo.findOne({ id: user_id });
   }
 
+  async getEntityRecById(
+    entity_type: EntityType,
+    entity_id: number,
+  ): Promise<any> {
+    return await getManager()
+      .createQueryBuilder(entity_type, entity_type)
+      .where('id = :entity_id', { entity_id })
+      .leftJoin('users', 'owner')
+      .getOne();
+  }
+
   async saveNotication(
     message: string,
     receiver_uid: number,
@@ -38,14 +49,14 @@ export class NotificationRepositoty {
     newNotification.entity_type = entity_type;
     newNotification.notify_type = notify_type;
     newNotification.data = message;
-
+    console.log('recivermdmdmdm', receiver_uid);
     try {
       await getManager().transaction(async (transactionManager) => {
         const created_notify = await transactionManager.save(newNotification);
 
         const newNotificationReceive = new NotificationReceive();
         newNotificationReceive.notification_id = created_notify.id;
-        newNotificationReceive.user_id = receiver_uid;
+        newNotificationReceive.owner_id = receiver_uid;
         await transactionManager.save(newNotificationReceive);
       });
     } catch (err) {

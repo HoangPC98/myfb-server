@@ -14,10 +14,6 @@ import { PostRepository } from './post.repository';
 export class PostService {
   constructor(
     @InjectRepository(Post) private readonly postRepo: Repository<Post>,
-    @InjectRepository(Comment)
-    private readonly commentRepo: Repository<Comment>,
-    @InjectRepository(Reaction)
-    private readonly reactionRepo: Repository<Reaction>,
   ) {}
   async createNewPost(uid, createPostDto: CreatePostDto, photo) {
     const newPost = new Post();
@@ -31,6 +27,7 @@ export class PostService {
     const newPhoto = new Photo();
     newPhoto.photo_url = photo.path;
     newPhoto.photo_type = PhotoType.PostPhoto;
+    newPhoto.owner_id = uid;
 
     try {
       await getManager().transaction(async (transactionManager) => {

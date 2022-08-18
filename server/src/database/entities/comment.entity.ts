@@ -22,7 +22,11 @@ export class Comment extends CustomBaseEntity {
   entity_id!: number;
 
   @Column()
-  user_id!: number;
+  owner_id!: number;
+
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'owner_id' })
+  Owner: User;
 
   @Column({
     type: 'enum',
@@ -30,10 +34,6 @@ export class Comment extends CustomBaseEntity {
     nullable: false,
   })
   entity_type!: EntityType;
-
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'user_id' })
-  User: User;
 
   @Column()
   text: string;

@@ -10,11 +10,11 @@ export class Reaction extends CustomBaseEntity {
   entity_id!: number;
 
   @PrimaryColumn()
-  reactor_id!: number;
+  owner_id!: number;
 
   @ManyToOne(() => User, (user) => user.Posts, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'reactor_id' })
-  User: User;
+  @JoinColumn({ name: 'owner_id' })
+  Owner: User;
 
   @Column({
     type: 'enum',

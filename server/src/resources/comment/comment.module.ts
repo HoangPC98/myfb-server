@@ -3,11 +3,13 @@ import { CommentService } from './comment.service';
 import { CommentController } from './comment.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Comment } from 'src/database/entities/comment.entity';
+import { NotificationService } from '../notification/notification.service';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Comment])],
+  imports: [TypeOrmModule.forFeature([Comment]), NotificationModule],
   controllers: [CommentController],
-  providers: [CommentService],
+  providers: [CommentService, NotificationService],
   // exports: [CommentService, CommentRepository],
 })
 export class CommentModule {}
