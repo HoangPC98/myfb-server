@@ -45,8 +45,7 @@
                 })
                 .then((result) => {
                     console.log('data...', result);
-                    // localStorage.setItem('accessToken', result['accessToken']);
-                    // localStorage.setItem('refreshToken', result['refreshToken']);
+                    console.log('accessToken...', result.data.accessToken)
                     document.cookie = `access_token=${result['accessToken']}`
                     document.cookie = `refresh_token=${result['accessToken']}`
 
