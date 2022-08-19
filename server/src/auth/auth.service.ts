@@ -15,7 +15,6 @@ import { JwtService } from '@nestjs/jwt';
 import { LoginSession } from 'src/database/entities/login-session.entity';
 import { Gender, User } from 'src/database/entities/user.entity';
 import { JwtUserPayload } from 'src/types/data-types/auth-user.type';
-import { UserRepository } from 'src/resources/user/user.repository';
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);

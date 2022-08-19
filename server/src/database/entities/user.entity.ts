@@ -39,7 +39,7 @@ export class User extends CustomBaseEntity {
     default: UserStatus.Active,
     nullable: true,
   })
-  status: UserStatus;
+  user_status: UserStatus;
 
   @Column()
   first_name: string;

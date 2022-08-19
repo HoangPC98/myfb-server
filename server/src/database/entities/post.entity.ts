@@ -32,6 +32,12 @@ export class Post extends CustomBaseEntity {
   @Column()
   text: string;
 
+  @Column({ nullable: false, default: 0 })
+  count_reaction: number;
+
+  @Column({ nullable: false, default: 0 })
+  count_comment: number;
+
   @OneToMany(() => Photo, (photo) => photo.Post, { cascade: true })
   Photos: Photo[];
 

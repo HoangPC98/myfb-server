@@ -8,7 +8,6 @@ import { LoginSession } from 'src/database/entities/login-session.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserModule } from 'src/resources/user/user.module';
-import { UserRepository } from 'src/resources/user/user.repository';
 import { JwtStrategy } from './strategies/jwt-accesstoken.strategy';
 
 @Module({

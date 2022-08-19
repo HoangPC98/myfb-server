@@ -8,7 +8,7 @@ import { Post } from 'src/database/entities/post.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
-export class PostRepository {
+export class PostsRepository {
   constructor(
     @InjectRepository(Post)
     private readonly PostRepo: Repository<Post>,

@@ -1,3 +1,8 @@
+export enum Order {
+  ASC = 'ASC',
+  DESC = 'DESC',
+}
+
 export enum EntityType {
   FriendShip = 'friend_ships',
   Post = 'posts',
@@ -24,4 +29,11 @@ export enum ReactionType {
   Haha = 'haha',
   Sad = 'sad',
   Angry = 'angry',
+}
+
+export enum QueryOption {
+  GetOne = 'get_one',
+  GetMany = 'get_many',
+  UseRepository = ' repository',
+  UseQueryBuilder = 'queryBuilder',
 }

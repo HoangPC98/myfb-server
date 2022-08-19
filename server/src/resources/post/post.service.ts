@@ -8,12 +8,13 @@ import { Reaction } from 'src/database/entities/reaction.entity';
 import { getManager, Repository } from 'typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { PostRepository } from './post.repository';
+import { PostsRepository } from './post.repository';
 
 @Injectable()
 export class PostService {
   constructor(
     @InjectRepository(Post) private readonly postRepo: Repository<Post>,
+    private readonly postRepository: PostsRepository,
   ) {}
   async createNewPost(uid, createPostDto: CreatePostDto, photo) {
     const newPost = new Post();

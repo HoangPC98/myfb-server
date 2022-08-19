@@ -4,6 +4,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryColumn,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -11,6 +12,7 @@ import CustomBaseEntity from './base-entity';
 import { Photo } from './photo.entity';
 import { Post } from './post.entity';
 import { PrivacyMode } from './privacy.entity';
+import { Reaction } from './reaction.entity';
 import { User } from './user.entity';
 
 @Entity('comments')
@@ -41,4 +43,16 @@ export class Comment extends CustomBaseEntity {
   @ManyToOne(() => Post, (post) => post.Comments, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'entity_id' })
   Post: Post;
+
+  @OneToMany(() => Comment, (comment) => comment.Post, { cascade: true })
+  ReplyComments: Comment[];
+
+  @OneToMany(() => Reaction, (reaction) => reaction.Post, { cascade: true })
+  Reactions: Reaction[];
+
+  @Column({ nullable: false, default: 0 })
+  count_reaction: number;
+
+  @Column({ nullable: false, default: 0 })
+  count_comment: number;
 }

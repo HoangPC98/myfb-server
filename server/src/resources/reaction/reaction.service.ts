@@ -1,7 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Reaction } from 'src/database/entities/reaction.entity';
-import { EntityType, NotifyType } from 'src/types/enum-types/common.enum';
+import {
+  EntityType,
+  NotifyType,
+  QueryOption,
+} from 'src/types/enum-types/common.enum';
 import { getManager, Repository } from 'typeorm';
 import { PostReactionDto } from './dto/post-reaction.dto';
 import { NotificationService } from '../notification/notification.service';
@@ -9,12 +13,13 @@ import console from 'console';
 import { Post } from 'src/database/entities/post.entity';
 import { Comment } from 'src/database/entities/comment.entity';
 import { Photo } from 'src/database/entities/photo.entity';
+import { getEntity } from 'src/repository/common.repository';
 
 @Injectable()
 export class ReactionService {
   constructor(
     @InjectRepository(Reaction)
-    private readonly reactionRepository: Repository<Reaction>,
+    private readonly reactionRepo: Repository<Reaction>,
     @InjectRepository(Post)
     private readonly postRepo: Repository<Post>,
     @InjectRepository(Comment)
@@ -37,20 +42,21 @@ export class ReactionService {
 
     const thisEntity = await repoObject.findOne({
       where: { id: postReactionDto.entity_id },
-      relations: ['Reactions'],
     });
 
     if (!thisEntity) throw new BadRequestException(this.notFoundEntityErrorMsg);
 
-    const checkReactedBefore = await this.reactionRepository.findOne({
+    const checkReactedBefore = await this.reactionRepo.findOne({
       entity_id: postReactionDto.entity_id,
       entity_type: postReactionDto.entity_type,
       owner_id: uid,
     });
 
+    console.log('checkRaactedBefore', checkReactedBefore);
+
     if (checkReactedBefore !== undefined) {
       checkReactedBefore.reaction_type = postReactionDto.react_option;
-      return await this.reactionRepository.save(checkReactedBefore);
+      return await this.reactionRepo.save(checkReactedBefore);
     }
     const newReaction = new Reaction();
     newReaction.reaction_type = postReactionDto.react_option;
@@ -58,7 +64,17 @@ export class ReactionService {
     newReaction.owner_id = uid;
     newReaction.entity_type = entityName;
 
-    await this.reactionRepository.save(newReaction);
+    console.log('newnew', newReaction);
+
+    thisEntity['count_reaction'] += 1;
+
+    console.log('count>>>', thisEntity);
+
+    await getManager().transaction(async (transactionManager) => {
+      await transactionManager.save(newReaction);
+
+      await transactionManager.save(thisEntity);
+    });
 
     if (uid === thisEntity.owner_id) return;
 
@@ -89,11 +105,26 @@ export class ReactionService {
     entity_id: number,
     reactor_id: number,
   ) {
-    await this.reactionRepository.delete({
-      entity_type: entity_type,
-      entity_id: entity_id,
-      owner_id: reactor_id,
-    });
-    return;
+    try {
+      const thisEntity = await getEntity(
+        entity_type,
+        entity_id,
+        QueryOption.GetOne,
+      );
+      thisEntity['count_reaction'] -= 1;
+
+      await getManager().transaction(async (transactionManager) => {
+        await transactionManager.softDelete(Reaction, {
+          entity_type: entity_type,
+          entity_id: entity_id,
+          owner_id: reactor_id,
+        });
+        await transactionManager.save(thisEntity);
+
+        return { message: 'ok' };
+      });
+    } catch (err) {
+      throw new Error(err);
+    }
   }
 }

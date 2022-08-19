@@ -40,4 +40,10 @@ export class Photo extends CustomBaseEntity {
 
   @Column()
   photo_url: string;
+
+  @Column({ nullable: false, default: 0 })
+  count_reaction: number;
+
+  @Column({ nullable: false, default: 0 })
+  count_comment: number;
 }

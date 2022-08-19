@@ -8,7 +8,8 @@ import { CommentDto } from './dto/add-comment.dto';
 import { Comment } from 'src/database/entities/comment.entity';
 import { getManager, Repository } from 'typeorm';
 import { NotificationService } from '../notification/notification.service';
-import { EntityType, NotifyType } from 'src/types/enum-types/common.enum';
+import { EntityType, NotifyType, QueryOption } from 'src/types/enum-types/common.enum';
+import { getEntity } from 'src/repository/common.repository';
 
 @Injectable()
 export class CommentService {
@@ -21,30 +22,35 @@ export class CommentService {
 
   async addComment(uid: number, addCommentDto: CommentDto) {
     try {
+      const thisEntity = await getEntity(
+        addCommentDto.entity_type,
+        addCommentDto.entity_id,
+        QueryOption.GetOne,
+      );
+
       const newComment = new Comment();
       newComment.owner_id = uid;
       newComment.entity_type = addCommentDto.entity_type;
       newComment.entity_id = addCommentDto.entity_id;
       newComment.text = addCommentDto.text;
-      await this.commentRepo.save(newComment);
 
-      const entity_name = newComment.entity_type;
-      const thisEntity = await getManager()
-        .createQueryBuilder(entity_name, 'entity')
-        .where('id = :entity_id', { entity_id: addCommentDto.entity_id })
-        .getOne();
+      thisEntity['count_comment'] += 1;
+
+      await getManager().transaction(async (transactionManager) => {
+        await transactionManager.save(newComment);
+        await transactionManager.save(thisEntity);
+      });
 
       console.log('this Entity', thisEntity);
 
       // send Notification if another comment owner post
       if (uid !== thisEntity['owner_id']) {
-        console.log('ltltltlt');
         await this.notificationService.sendNotificationFromOneToOne(
           uid,
           thisEntity['owner_id'],
           addCommentDto.entity_id,
           NotifyType.HasComment,
-          entity_name,
+          addCommentDto.entity_type,
         );
       }
 
@@ -76,11 +82,26 @@ export class CommentService {
       throw new BadRequestException(
         `${this.notFoundEntityErrorMsg} for delete`,
       );
+
+    const thisEntity = await getEntity(
+      getComment.entity_type,
+      getComment.entity_id,
+      QueryOption.GetOne,
+    );
+
+    thisEntity['count_comment'] -= 1;
+    if (thisEntity['count_comment'] < 0) thisEntity['count_comment'] = 0;
+
     try {
-      return await this.commentRepo.softDelete({
-        id: comment_id,
-        owner_id: user_id,
+      await getManager().transaction(async (transactionManager) => {
+        await this.commentRepo.softDelete({
+          id: comment_id,
+          owner_id: user_id,
+        });
+
+        await transactionManager.save(thisEntity);
       });
+      return { message: 'ok' };
     } catch (err) {
       throw new Error(err);
     }

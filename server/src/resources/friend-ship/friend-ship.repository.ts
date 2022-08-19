@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FriendShip } from 'src/database/entities/friend-ship.entity';
 import { Repository } from 'typeorm';

@@ -24,10 +24,10 @@
         "seed:run": "ts-node -r tsconfig-paths/register ./node_modules/typeorm-seeding/dist/cli.js seed -n src/database/typeormconfig.ts",
         "schema:drop": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js -f src/database/typeormconfig.ts schema:drop",
         "schema:sync": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js -f src/database/typeormconfig.ts schema:sync",
-        "migration:generate": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js -f src/database/typeormconfig.ts migration:generate -n",
-        "migration:create": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js -f src/database/typeormconfig.ts migration:create -n",
-        "migration:run": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js -f src/database/typeormconfig.ts migration:run -t=false",
-        "migration:revert": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js -f src/database/typeormconfig.ts migration:revert"
+        "mig:gen": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js -f src/database/typeormconfig.ts migration:generate -n",
+        "mig:create": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js -f src/database/typeormconfig.ts migration:create -n",
+        "mig:run": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js -f src/database/typeormconfig.ts migration:run -t=false",
+        "mig:revert": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js -f src/database/typeormconfig.ts migration:revert"
     },
     "dependencies": {
         "@casl/ability": "^5.4.3",

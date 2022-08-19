@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, OneToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import CustomBaseEntity from './base-entity';
 import { Post } from './post.entity';
 import { User } from './user.entity';
@@ -11,11 +11,8 @@ export enum RelationshipStatus {
 
 @Entity('profiles')
 export class Profile extends CustomBaseEntity {
-  @PrimaryColumn()
-  user_id: number;
-
-  @OneToOne(() => User, (user) => user.Profile)
-  user: User;
+  @PrimaryGeneratedColumn()
+  uid: number;
 
   @Column()
   bio: string;
@@ -42,7 +39,4 @@ export class Profile extends CustomBaseEntity {
 
   @Column({ unique: true })
   email: string;
-
-  @OneToMany(() => Post, (post) => post.Owner, { cascade: true })
-  Posts: Post[];
 }

@@ -33,7 +33,7 @@ export class FriendShip extends CustomBaseEntity {
     default: 'pending',
     nullable: true,
   })
-  status: FriendShipStatus;
+  friendship_status: FriendShipStatus;
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'sender_uid' })

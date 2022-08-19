@@ -4,14 +4,8 @@ import {
   FriendShip,
   FriendShipStatus,
 } from 'src/database/entities/friend-ship.entity';
-import {
-  EntityType,
-  NotifyType,
-  ReplyAddFrRequest,
-} from 'src/types/enum-types/common.enum';
+import { ReplyAddFrRequest } from 'src/types/enum-types/common.enum';
 import { Repository } from 'typeorm';
-import { NotificationService } from '../notification/notification.service';
-import { AddFriendDto } from './dto/add-fr.dto';
 import { FriendShipRepositoty } from './friend-ship.repository';
 
 @Injectable()
@@ -70,13 +64,13 @@ export class FriendShipService {
       },
       ['Sender', 'Receiver'],
     );
-    thisRequest.status =
+    thisRequest.friendship_status =
       option === ReplyAddFrRequest.Accept
         ? FriendShipStatus.BeFriended
         : FriendShipStatus.RejectFriend;
 
     if (option === ReplyAddFrRequest.Accept) {
-      thisRequest.status = FriendShipStatus.BeFriended;
+      thisRequest.friendship_status = FriendShipStatus.BeFriended;
       const sender_uid = thisRequest.receiver_uid;
       const receiver_uid = thisRequest.sender_uid;
 
@@ -90,7 +84,7 @@ export class FriendShipService {
       //   message,
       // );
     } else {
-      thisRequest.status = FriendShipStatus.RejectFriend;
+      thisRequest.friendship_status = FriendShipStatus.RejectFriend;
     }
     return await this.friendShipRepo.save(thisRequest);
 
