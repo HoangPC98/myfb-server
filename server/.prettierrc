@@ -2,7 +2,7 @@
     "singleQuote": true,
     "trailingComma": "all",
     "max-line-length": [
-        true,
+        false,
         {
             "limit": 600,
             "ignore-pattern": "^import |^export {(.*?)}"

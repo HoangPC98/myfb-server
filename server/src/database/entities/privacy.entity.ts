@@ -6,6 +6,7 @@ export enum PrivacyMode {
   Public = 'public',
   Friend = 'friend',
   Private = 'private',
+  All = 'all',
 }
 
 @Entity('privacy')
@@ -19,7 +20,7 @@ export class Privacy extends CustomBaseEntity {
     default: PrivacyMode.Public,
     nullable: true,
   })
-  view_post: Privacy;
+  view_post: PrivacyMode;
 
   @Column({
     type: 'enum',
@@ -27,7 +28,7 @@ export class Privacy extends CustomBaseEntity {
     default: PrivacyMode.Public,
     nullable: true,
   })
-  comment_post!: Privacy;
+  comment_post: PrivacyMode;
 
   @Column({
     type: 'enum',
@@ -35,7 +36,39 @@ export class Privacy extends CustomBaseEntity {
     default: PrivacyMode.Public,
     nullable: true,
   })
-  share_post!: Privacy;
+  share_post: PrivacyMode;
+
+  @Column({
+    type: 'enum',
+    enum: PrivacyMode,
+    default: PrivacyMode.Public,
+    nullable: true,
+  })
+  reaction_post: PrivacyMode;
+
+  @Column({
+    type: 'enum',
+    enum: PrivacyMode,
+    default: PrivacyMode.Public,
+    nullable: true,
+  })
+  view_friendship: PrivacyMode;
+
+  @Column({
+    type: 'enum',
+    enum: PrivacyMode,
+    default: PrivacyMode.Public,
+    nullable: true,
+  })
+  view_photo: PrivacyMode;
+
+  @Column({
+    type: 'enum',
+    enum: PrivacyMode,
+    default: PrivacyMode.Public,
+    nullable: true,
+  })
+  view_profile: PrivacyMode;
 
   @OneToOne(() => User, (user: User) => user.Privacy)
   User: User;

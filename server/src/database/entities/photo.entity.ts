@@ -11,9 +11,10 @@ import { Post } from './post.entity';
 import { User } from './user.entity';
 
 export enum PhotoType {
+  Prf = 'profile',
   Avatar = 'avatar',
   CoverPhoto = 'cover',
-  PostPhoto = 'post',
+  Post = 'post',
 }
 
 @Entity('photos')

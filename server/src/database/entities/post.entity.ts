@@ -26,7 +26,12 @@ export class Post extends CustomBaseEntity {
   @JoinColumn({ name: 'owner_id' })
   Owner: User;
 
-  @Column({ type: 'enum', enum: PrivacyMode, default: null, nullable: true })
+  @Column({
+    type: 'enum',
+    enum: PrivacyMode,
+    default: PrivacyMode.Public,
+    nullable: true,
+  })
   privacy_mode: PrivacyMode;
 
   @Column()

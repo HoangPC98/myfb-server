@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from 'src/database/entities/comment.entity';
 import { Photo, PhotoType } from 'src/database/entities/photo.entity';
@@ -16,33 +20,29 @@ export class PostService {
     @InjectRepository(Post) private readonly postRepo: Repository<Post>,
     private readonly postRepository: PostsRepository,
   ) {}
+
+  private readonly errCreatePostMsg = 'error when save new post/photo';
   async createNewPost(uid, createPostDto: CreatePostDto, photo) {
     const newPost = new Post();
     newPost.owner_id = uid;
-    newPost.privacy_mode = PrivacyMode.Public;
+    newPost.privacy_mode = createPostDto.privacy_mode;
     newPost.text = createPostDto.text;
     if (!photo) {
       return await this.postRepo.save(newPost);
     }
 
     const newPhoto = new Photo();
-    newPhoto.photo_url = photo.path;
-    newPhoto.photo_type = PhotoType.PostPhoto;
+    newPhoto.photo_url = photo.path.replace('public/', '');
+    newPhoto.photo_type = PhotoType.Post;
     newPhoto.owner_id = uid;
 
     try {
-      await getManager().transaction(async (transactionManager) => {
-        const createPost = await transactionManager.save(newPost);
-        newPhoto.post_id = createPost.id;
-        await transactionManager.save(newPhoto);
-      });
-      return {
-        message: 'ok',
-      };
+      await this.postRepository.saveNewPost(newPost, newPhoto);
     } catch (err) {
       console.error('error when save new post/photo', err);
       throw new InternalServerErrorException('error when save new post/photo');
     }
+    return 1;
   }
 
   async getAllPostByUserId(user_id: number) {
@@ -52,5 +52,30 @@ export class PostService {
     });
     console.log('post reccccc', postRecs);
     return postRecs;
+  }
+
+  async addNewProfilePhoto(uid: number, addNewDto: CreatePostDto, photoObj) {
+    if (!photoObj) {
+      throw new BadRequestException('update avatar required a photo');
+    }
+
+    console.log('add new profile photo', photoObj);
+
+    const newPost = new Post();
+    newPost.owner_id = uid;
+    newPost.text = addNewDto.text;
+    newPost.privacy_mode = addNewDto.privacy_mode;
+
+    const newPhoto = new Photo();
+    newPhoto.photo_url = photoObj.path.replace('public/', '');
+    newPhoto.owner_id = uid;
+    newPhoto.photo_type = addNewDto.photo_type;
+    try {
+      await this.postRepository.saveNewPost(newPost, newPhoto);
+    } catch (err) {
+      console.error(this.errCreatePostMsg, err);
+      throw new InternalServerErrorException(this.errCreatePostMsg);
+    }
+    return 1;
   }
 }

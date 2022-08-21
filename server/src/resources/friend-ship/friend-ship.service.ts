@@ -4,8 +4,9 @@ import {
   FriendShip,
   FriendShipStatus,
 } from 'src/database/entities/friend-ship.entity';
-import { ReplyAddFrRequest } from 'src/types/enum-types/common.enum';
+import { EntityType, NotifyType, ReplyAddFrRequest } from 'src/types/enum-types/common.enum';
 import { Repository } from 'typeorm';
+import { NotificationService } from '../notification/notification.service';
 import { FriendShipRepositoty } from './friend-ship.repository';
 
 @Injectable()
@@ -14,6 +15,7 @@ export class FriendShipService {
     @InjectRepository(FriendShip)
     private readonly friendShipRepo: Repository<FriendShip>,
     private readonly friendshipRepository: FriendShipRepositoty,
+    private readonly notificationService: NotificationService,
   ) {}
   private readonly notFoundAddFrErrMsg = 'Not Found Add Friend Request';
 
@@ -37,13 +39,13 @@ export class FriendShipService {
 
       // push notification
 
-      // this.notificationService.sendNotificationFromOneToOne(
-      //   addFriendDto.sender_uid,
-      //   addFriendDto.receiver_uid,
-      //   createdFriendShip.id,
-      //   NotifyType.AddFriendRequest,
-      //   EntityType.FriendShip,
-      // );
+      await this.notificationService.sendNotificationFromOneToOne(
+        addFriendDto.sender_uid,
+        addFriendDto.receiver_uid,
+        createdFriendShip.id,
+        NotifyType.AddFriendRequest,
+        EntityType.FriendShip,
+      );
       return {
         message: 'ok',
       };
@@ -75,14 +77,14 @@ export class FriendShipService {
       const receiver_uid = thisRequest.sender_uid;
 
       const message = `${thisRequest.Receiver.given_name} has accept your friend request`;
-      // this.notificationService.sendNotificationFromOneToOne(
-      //   sender_uid,
-      //   receiver_uid,
-      //   thisRequest.id,
-      //   NotifyType.AcceptFriendReq,
-      //   EntityType.FriendShip,
-      //   message,
-      // );
+      await this.notificationService.sendNotificationFromOneToOne(
+        sender_uid,
+        receiver_uid,
+        thisRequest.id,
+        NotifyType.AcceptFriendReq,
+        EntityType.FriendShip,
+        message,
+      );
     } else {
       thisRequest.friendship_status = FriendShipStatus.RejectFriend;
     }

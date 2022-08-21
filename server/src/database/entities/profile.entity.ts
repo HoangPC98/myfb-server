@@ -12,7 +12,7 @@ export enum RelationshipStatus {
 @Entity('profiles')
 export class Profile extends CustomBaseEntity {
   @PrimaryGeneratedColumn()
-  uid: number;
+  user_id: number;
 
   @Column()
   bio: string;

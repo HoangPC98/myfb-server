@@ -1,22 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import {
-  FriendShip,
-  FriendShipStatus,
-} from 'src/database/entities/friend-ship.entity';
-import { Photo } from 'src/database/entities/photo.entity';
+
 import { User } from 'src/database/entities/user.entity';
-import { getEntityPagination } from 'src/repository/common.repository';
-import {
-  EntityType,
-  Order,
-  QueryOption,
-} from 'src/types/enum-types/common.enum';
+import { EntityType, UserInfoType } from 'src/types/enum-types/common.enum';
+
 import { searchByUserNameUnicode } from 'src/utils/search-engine.util';
-import { getManager } from 'typeorm';
-import { Repository } from 'typeorm/repository/Repository';
-import { CreateUserDto } from './dto/create-user.dto';
-import { GetProfileQuery } from './dto/get-profile.dto';
+import {
+  UpdateUserInfoDto,
+  UpdateUserPrivacyDto,
+  UpdateProfilePhoto,
+} from './dto/update-user.dto';
 import { UsersRepository } from './user.repository';
 
 @Injectable()
@@ -26,10 +18,6 @@ export class UserService {
   private readonly PREVIEW_FRIEND_ITEM_NUM = 6;
   private readonly PREVIEW_PHOTO_ITEM_NUM = 9;
 
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
-  }
-
   async searchByUsername(inputString: string) {
     const allUser = await this.userRepository.getAllUser();
     const filterUser = searchByUserNameUnicode(inputString, allUser);
@@ -37,6 +25,36 @@ export class UserService {
     return {
       response: filterUser,
     };
+  }
+
+  async updateUser(type: UserInfoType, uid: number, payload) {
+    let result;
+    let entity_type: EntityType;
+    if (type === UserInfoType.BasicInfo) {
+      entity_type = EntityType.User;
+      payload['given_name'] = this.setGivenName(
+        payload.first_name,
+        payload.last_name,
+      );
+      result = await this.userRepository.updateUserByUID(
+        entity_type,
+        uid,
+        payload,
+      );
+    } else if (type === UserInfoType.Profile) {
+      result = await this.userRepository.updateUserByUID(
+        entity_type,
+        uid,
+        payload,
+      );
+    } else {
+      result = await this.userRepository.updateUserByUID(
+        entity_type,
+        uid,
+        payload,
+      );
+    }
+    return result;
   }
 
   async getProfile(user_id: number, uid: number): Promise<any> {
@@ -97,7 +115,7 @@ export class UserService {
       };
     });
 
-    const result = {
+    const result = await {
       userInfo,
       friends: {
         count_all: countAllFriend,
@@ -110,5 +128,9 @@ export class UserService {
       posts: listPostMaping,
     };
     return { response: result };
+  }
+
+  private setGivenName(firstName: string, lastName: string): string {
+    return firstName + ' ' + lastName;
   }
 }

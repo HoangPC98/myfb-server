@@ -1,3 +1,9 @@
+export enum UserInfoType {
+  BasicInfo = 'basic_info',
+  Profile = 'profile',
+  Privacy = 'privacy',
+}
+
 export enum Order {
   ASC = 'ASC',
   DESC = 'DESC',
@@ -9,6 +15,9 @@ export enum EntityType {
   Reaction = 'reactions',
   Photo = 'photos',
   Comment = 'comments',
+  User = 'users',
+  Profile = 'profiles',
+  Privacy = 'privacy',
 }
 
 export enum NotifyType {
@@ -29,6 +38,14 @@ export enum ReactionType {
   Haha = 'haha',
   Sad = 'sad',
   Angry = 'angry',
+}
+
+export enum FileType {
+  ProfilePhoto = 'profilephoto',
+  Avatar = 'avatar',
+  CoverPhoto = 'coverphoto',
+  PostPhoto = 'postphoto',
+  Other = 'other',
 }
 
 export enum QueryOption {

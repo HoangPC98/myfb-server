@@ -15,6 +15,7 @@ import { Post } from './post.entity';
 import { Privacy } from './privacy.entity';
 import { Profile } from './profile.entity';
 import { Photo } from './photo.entity';
+import { DEFAULT_AVATAR_URL } from 'src/constants/common.constant';
 
 export enum UserStatus {
   Active = 'active',
@@ -53,8 +54,11 @@ export class User extends CustomBaseEntity {
   @Column({ type: 'enum', enum: Gender, default: null, nullable: true })
   gender: Gender;
 
-  @Column()
+  @Column({ nullable: false, default: DEFAULT_AVATAR_URL })
   avatar_url: string;
+
+  @Column()
+  cover_photo_url: string;
 
   @Column({ unique: true })
   email: string;

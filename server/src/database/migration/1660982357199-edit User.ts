@@ -1,11 +1,10 @@
 import {MigrationInterface, QueryRunner} from "typeorm";
 
-export class modifyStatusNameCol1660933979514 implements MigrationInterface {
-    name = 'modifyStatusNameCol1660933979514'
+export class editUser1660982357199 implements MigrationInterface {
+    name = 'editUser1660982357199'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`ALTER TABLE \`users\` CHANGE \`status\` \`user_status\` enum ('active', 'inactive', 'locked') NULL DEFAULT ''active''`);
-        await queryRunner.query(`ALTER TABLE \`friend_ships\` CHANGE \`status\` \`friendship_status\` enum ('pending', 'beFriended', 'blocked', 'rejectFriend') NULL DEFAULT ''pending''`);
+        await queryRunner.query(`ALTER TABLE \`users\` ADD \`cover_photo_url\` varchar(255) NOT NULL`);
         await queryRunner.query(`ALTER TABLE \`login_sessions\` CHANGE \`deletedAt\` \`deletedAt\` datetime(6) NULL`);
         await queryRunner.query(`ALTER TABLE \`login_sessions\` CHANGE \`fcm_token\` \`fcm_token\` varchar(255) NULL`);
         await queryRunner.query(`ALTER TABLE \`notifications\` CHANGE \`deletedAt\` \`deletedAt\` datetime(6) NULL`);
@@ -22,6 +21,7 @@ export class modifyStatusNameCol1660933979514 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE \`users\` DROP FOREIGN KEY \`FK_505172424dcd411ba576478d4e1\``);
         await queryRunner.query(`ALTER TABLE \`users\` CHANGE \`deletedAt\` \`deletedAt\` datetime(6) NULL`);
         await queryRunner.query(`ALTER TABLE \`users\` CHANGE \`gender\` \`gender\` enum ('male', 'female', 'other') NULL`);
+        await queryRunner.query(`ALTER TABLE \`users\` CHANGE \`avatar_url\` \`avatar_url\` varchar(255) NOT NULL DEFAULT 'https://as2.ftcdn.net/jpg/02/15/84/43/220_F_215844325_ttX9YiIIyeaR7Ne6EaLLjMAmy4GvPC69.jpg'`);
         await queryRunner.query(`ALTER TABLE \`users\` CHANGE \`profileUid\` \`profileUid\` int NULL`);
         await queryRunner.query(`ALTER TABLE \`users\` CHANGE \`privacyUserId\` \`privacyUserId\` int NULL`);
         await queryRunner.query(`ALTER TABLE \`photos\` CHANGE \`deletedAt\` \`deletedAt\` datetime(6) NULL`);
@@ -49,6 +49,7 @@ export class modifyStatusNameCol1660933979514 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE \`photos\` CHANGE \`deletedAt\` \`deletedAt\` datetime(6) NULL DEFAULT 'NULL'`);
         await queryRunner.query(`ALTER TABLE \`users\` CHANGE \`privacyUserId\` \`privacyUserId\` int NULL DEFAULT 'NULL'`);
         await queryRunner.query(`ALTER TABLE \`users\` CHANGE \`profileUid\` \`profileUid\` int NULL DEFAULT 'NULL'`);
+        await queryRunner.query(`ALTER TABLE \`users\` CHANGE \`avatar_url\` \`avatar_url\` varchar(255) NOT NULL`);
         await queryRunner.query(`ALTER TABLE \`users\` CHANGE \`gender\` \`gender\` enum ('male', 'female', 'other') NULL DEFAULT 'NULL'`);
         await queryRunner.query(`ALTER TABLE \`users\` CHANGE \`deletedAt\` \`deletedAt\` datetime(6) NULL DEFAULT 'NULL'`);
         await queryRunner.query(`ALTER TABLE \`users\` ADD CONSTRAINT \`FK_505172424dcd411ba576478d4e1\` FOREIGN KEY (\`privacyUserId\`) REFERENCES \`privacy\`(\`user_id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
@@ -65,8 +66,7 @@ export class modifyStatusNameCol1660933979514 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE \`notifications\` CHANGE \`deletedAt\` \`deletedAt\` datetime(6) NULL DEFAULT 'NULL'`);
         await queryRunner.query(`ALTER TABLE \`login_sessions\` CHANGE \`fcm_token\` \`fcm_token\` varchar(255) NULL DEFAULT 'NULL'`);
         await queryRunner.query(`ALTER TABLE \`login_sessions\` CHANGE \`deletedAt\` \`deletedAt\` datetime(6) NULL DEFAULT 'NULL'`);
-        await queryRunner.query(`ALTER TABLE \`friend_ships\` CHANGE \`friendship_status\` \`status\` enum ('pending', 'beFriended', 'blocked', 'rejectFriend') NULL DEFAULT ''pending''`);
-        await queryRunner.query(`ALTER TABLE \`users\` CHANGE \`user_status\` \`status\` enum ('active', 'inactive', 'locked') NULL DEFAULT ''active''`);
+        await queryRunner.query(`ALTER TABLE \`users\` DROP COLUMN \`cover_photo_url\``);
     }
 
 }

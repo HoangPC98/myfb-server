@@ -7,9 +7,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { FriendShip } from 'src/database/entities/friend-ship.entity';
 import { Photo } from 'src/database/entities/photo.entity';
 import { Post } from 'src/database/entities/post.entity';
+import { Profile } from 'src/database/entities/profile.entity';
+import { Privacy } from 'src/database/entities/privacy.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Post, FriendShip, Photo])],
+  imports: [
+    TypeOrmModule.forFeature([User, Profile, Privacy, Post, FriendShip, Photo]),
+  ],
   controllers: [UserController],
   providers: [UserService, UsersRepository],
 })

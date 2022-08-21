@@ -8,7 +8,7 @@ import { FriendShipRepositoty } from './friend-ship.repository';
 import { User } from 'src/database/entities/user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([FriendShip])],
+  imports: [TypeOrmModule.forFeature([FriendShip]), NotificationModule],
   controllers: [FriendShipController],
   providers: [FriendShipService, FriendShipRepositoty],
 })

@@ -26,6 +26,7 @@ export class TransformResponseInterceptor<T>
         if (data instanceof StreamableFile) {
           return data;
         }
+        console.log('dara resources',data)
 
         return {
           statusCode: <number>context.switchToHttp().getResponse().statusCode,

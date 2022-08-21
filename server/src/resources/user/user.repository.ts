@@ -6,7 +6,8 @@ import {
 } from 'src/database/entities/friend-ship.entity';
 import { Photo } from 'src/database/entities/photo.entity';
 import { Post } from 'src/database/entities/post.entity';
-import { PrivacyMode } from 'src/database/entities/privacy.entity';
+import { Privacy, PrivacyMode } from 'src/database/entities/privacy.entity';
+import { Profile } from 'src/database/entities/profile.entity';
 import { User } from 'src/database/entities/user.entity';
 import {
   countEntityRecord,
@@ -18,13 +19,17 @@ import {
   Order,
   QueryOption,
 } from 'src/types/enum-types/common.enum';
-import { In } from 'typeorm';
+import { getManager, In } from 'typeorm';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class UsersRepository {
   constructor(
     @InjectRepository(User) private readonly userRepo: Repository<User>,
+    @InjectRepository(Profile)
+    private readonly profileRepo: Repository<Profile>,
+    @InjectRepository(Privacy)
+    private readonly privacyRepo: Repository<Privacy>,
     @InjectRepository(Post)
     private readonly postRepo: Repository<FriendShip>,
     @InjectRepository(FriendShip)
@@ -53,6 +58,20 @@ export class UsersRepository {
 
   async getAllUser() {
     return await this.userRepo.find();
+  }
+
+  async updateUserByUID(entity_type: EntityType, uid: number, payload: any) {
+    let whereString = 'user_id = :uid';
+
+    if (entity_type === EntityType.User) {
+      whereString = 'id = :uid';
+    }
+    return await getManager()
+      .createQueryBuilder(entity_type, entity_type)
+      .update(entity_type)
+      .set(payload)
+      .where(whereString, { uid })
+      .execute();
   }
 
   async getListPostByUserId(user_id: number, isMine?: boolean) {

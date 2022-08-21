@@ -52,7 +52,7 @@ export class ReactionService {
       owner_id: uid,
     });
 
-    console.log('checkRaactedBefore', checkReactedBefore);
+    console.log('checkRaactedBefore', thisEntity);
 
     if (checkReactedBefore !== undefined) {
       checkReactedBefore.reaction_type = postReactionDto.react_option;
@@ -80,9 +80,9 @@ export class ReactionService {
 
     // push notification Reactions
     let pre_process_msg = '';
-    const reactionCount = thisEntity.Reactions.length;
+    const reactionCount = thisEntity.count_reaction;
     console.log('reactionCount', reactionCount);
-    if (reactionCount === 0 || undefined) {
+    if (reactionCount === 1 || undefined) {
       pre_process_msg = `$username has express reaction about your ${entityName}`;
     } else
       pre_process_msg = `$username and ${reactionCount} others has express reaction about your ${entityName}`;
