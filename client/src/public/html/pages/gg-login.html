@@ -44,10 +44,9 @@
                     return response.json();
                 })
                 .then((result) => {
-                    console.log('data...', result);
-                    console.log('accessToken...', result.data.accessToken)
-                    document.cookie = `access_token=${result['accessToken']}`
-                    document.cookie = `refresh_token=${result['accessToken']}`
+                    console.log('accessToken>>>', result.data.accessToken)
+                    document.cookie = `access_token=${result.data.accessToken}`
+                    document.cookie = `refresh_token=${result.data.refreshToken}`
 
                     window.location.href = '/home'
                 })

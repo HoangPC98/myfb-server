@@ -50,8 +50,7 @@ document.querySelector('#cancel-upload-img').onclick = function() {
 
 
 const upload = async(payload) => {
-    const access_token = getCookieByName('access_token')
-    const headerAUthorization = 'Bearer ' + access_token
+
 
     let isIncludeFile, data
     if (payload.file !== undefined) {
@@ -68,7 +67,7 @@ const upload = async(payload) => {
     }
 
     console.log('fom datatata', data)
-    const resonse = await postRequest('posts/new', headerAUthorization, data, isIncludeFile)
+    const resonse = await postRequest('posts/new', data, isIncludeFile)
     if (resonse.status === 201) alert('Upload successfully')
     else alert('Failed to upload')
     window.location.reload()

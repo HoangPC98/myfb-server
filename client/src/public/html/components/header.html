@@ -274,7 +274,7 @@
                             </p>
                             <i class="fas fa-chevron-right"></i>
                         </li>
-                        <li class="setting__item nav-logout">
+                        <li id="logout-btn" class="setting__item nav-logout">
                             <a>
                                 <div class="setting__item-img">
                                     <i class="fas fa-sign-out-alt"></i>
@@ -307,11 +307,12 @@
         </ul>
     </div>
 </header>
+
+<script type="module" src="/js/header.js"></script>
 <script>
     // Click to Caret-down : show logout button
 
     $('.header-right__item').click(function() {
-            console.log('LOGUT..........')
             if (this.classList.contains('active')) {
                 this.classList.remove('active')
             } else {

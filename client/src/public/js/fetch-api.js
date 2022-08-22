@@ -7,7 +7,7 @@ const convertParams = (params) => {
     const keyParams = Object.keys(params)
     const valueParams = Object.values(params)
     console.log(keyParams, valueParams)
-    let stringParams = ''
+    let stringParams = '?'
     for (let i = 0; i < keyParams.length; ++i) {
         stringParams += `${keyParams[i]}=${valueParams[i]}`
         if (i < keyParams.length - 1) stringParams += '&'
@@ -15,8 +15,9 @@ const convertParams = (params) => {
     return stringParams
 }
 
-export const postRequest = async(endpoint, authorization, payload, isIncludeFile) => {
+export const postRequest = async(endpoint, payload, isIncludeFile) => {
     const uri = `${serverUrl}/${endpoint}`
+    const authorization = 'Bearer ' + getCookieByName('access_token')
     const options = {
         method: "POST",
     }
@@ -40,8 +41,9 @@ export const postRequest = async(endpoint, authorization, payload, isIncludeFile
 }
 
 export const getRequest = async(endpoint, params) => {
-    const stringParams = convertParams(params)
-    const uri = `${serverUrl}/${endpoint}?${stringParams}`
+    const stringParams = params ? convertParams(params) : ''
+
+    const uri = `${serverUrl}/${endpoint}${stringParams}`
     const authorization = 'Bearer ' + getCookieByName('access_token')
     const options = {
         method: 'GET',

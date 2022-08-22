@@ -11,4 +11,5 @@ const loadUserInfo = () => {
     $('#avatar-postnew').attr('src', decodeToken.avatar_url)
     $('#header-me-dropdown').attr('src', decodeToken.avatar_url)
     $('#header-username').html(decodeToken.last_name)
+
 }

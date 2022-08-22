@@ -1,4 +1,3 @@
-
 const moreList = $$('.container-left__more-list')
 const moreBtn = $$('.container-left__more')
 const lessFavBtn = $$('.container-left__less')
@@ -18,25 +17,27 @@ const comments = JSON.parse(localStorage.getItem('comments')) || []
 
 //xem thêm, ấn bớt item layout trái
 for (let i = 0; i < moreBtn.length; i++) {
-    moreBtn[i].onclick = function(){
+    moreBtn[i].onclick = function() {
         this.style.display = 'none'
         moreList[i].style.display = 'block'
         lessFavBtn[i].style.display = 'flex'
     }
-    lessFavBtn[i].onclick = function(){
+    lessFavBtn[i].onclick = function() {
         this.style.display = 'none'
         moreList[i].style.display = 'none'
         moreBtn[i].style.display = 'flex'
     }
 }
 
+
+
 //number to short number
 const compactNumber = (value) => {
     const suffixes = ["", "k", "m", "b", "t"]
-    if((""+value).length <= 3) {
-        return (""+value)
+    if (("" + value).length <= 3) {
+        return ("" + value)
     }
-    const suffixNum = Math.floor((""+value).length/3)
+    const suffixNum = Math.floor(("" + value).length / 3)
     let shortValue = parseFloat((suffixNum != 0 ? (value / Math.pow(1000, suffixNum)) : (value).toPrecision(2)))
     if (shortValue % 1 != 0) {
         shortValue = shortValue.toFixed(1)
@@ -46,8 +47,7 @@ const compactNumber = (value) => {
 
 //render danh sách liên hệ
 const userOnline = (() => {
-    const uersOnl = [
-        {
+    const uersOnl = [{
             path: "./assets/img/Home/user-1.jpg",
             name: "Nguyễn Hoàng Uyên My",
         },
@@ -82,7 +82,7 @@ const userOnline = (() => {
     ]
 
     return {
-        render(){
+        render() {
             const htmls = uersOnl.map((user) => {
                 return `
                 <li class="container-right__connect-item">
@@ -112,9 +112,9 @@ const app = (() => {
     return {
         idUser: x ? id : null,
         editMode: false,
-        showInfoUser(){
+        showInfoUser() {
             const darkBtns = $$('.header-switch__box ')
-            if (obj.mode == 'dark'){
+            if (obj.mode == 'dark') {
                 $('.app').classList.add('dark')
                 darkBtns.forEach(dark => {
                     dark.classList.add('dark')
@@ -127,7 +127,7 @@ const app = (() => {
             }
 
             const bg = users[id].bg ? users[id].bg :
-            "./assets/img/wall/profile-bg.png"
+                "./assets/img/wall/profile-bg.png"
 
             $$('.avt').forEach((item) => {
                 item.src = users[id].avatar
@@ -140,7 +140,7 @@ const app = (() => {
             })
             $('.my-wall__top-bg-img').src = bg
         },
-        render(){
+        render() {
             let htmls = ''
             newfeeds.forEach((newfeed) => {
                 const condition = $('.my-wall').style.display === 'block' ? newfeed.idUser == this.idUser : true
@@ -313,57 +313,72 @@ const app = (() => {
                                     </div>
                                 </div>
                                 <div class="commented-box active">
-                                    ${
-                                        cmts.map((cmt) => {
-                                            const userCmt = users.find((user) => {
-                                                return cmt.idUser === user.id
-                                            })
-                                            const cmtSubs = comments.filter(comment => {
-                                                return comment.parentIdCmt === cmt.id && comment.sub && !comment.deleted
-                                            })
-    
-                                            return `
-                                            <div class="commented-box__item">
-                                                <div class="commented-box__item-user">
-                                                    <div class="commented-box__item-avatar">
-                                                        <img src="${userCmt.avatar}"  alt="">
-                                                    </div>
-                                                    <div class="commented-box__item-info">
-                                                        <div class="wrap">
-                                                            <div class="comented-box__item-content">
-                                                                <div class="comented-box__item-name">
-                                                                    ${userCmt.fullName}
-                                                                </div>
-                                                                <div class="comented-box__item-text">
-                                                                    ${cmt.content}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="commented-box__item-reaction" data-index="${cmt.id}">
-                                                            <span class=" ${users[this.idUser].cmtLiked.includes(cmt.id.toString()) ? 'active' : ''} commented-box__item-reaction--like">Thích</span>
-                                                            •
-                                                            <span class="commented-box__item-reaction--respond">Phản hồi</span>
-                                                        </div>
-                                                        <div style="display: ${cmt.like ? 'flex' : 'none'}" class="commented-count-reaction">
-                                                            <i class="fas fa-thumbs-up"></i>
-                                                            <span>${cmt.like}</span>
-                                                        </div>
-                                                    </div>
-                                                    <div data-index="${cmt.id}" class="commented-box__item-delete" style="display: ${this.idUser == cmt.idUser ? 'block' : 'none'}" >
-                                                        <i class="fad fa-trash-alt"></i>
-                                                    </div>
-                                                </div>
-    
-                                                <div style="display: ${cmtSubs.length ? 'block' : 'none'}" class="commented-box__item-respond-list">
-                                                    ${
-                                                        cmtSubs.map((cmt2, index) => {
-                                                            let cmtsub = ''
-                                                            const user = users.find((user) => {
-                                                                return cmt2.idUser === user.id
-                                                            })
-    
-                                                            return `
-                                                            <div class="commented-box__item-user sub">
+                                    ${cmts.map((cmt) => {
+                        const userCmt = users.find((user) => {
+                            return cmt.idUser === user.id
+                        })
+                        const cmtSubs = comments.filter(comment => {
+                            return comment.parentIdCmt === cmt.id && comment.sub && !comment.deleted
+                        })
+
+                        return ` <
+                        div class = "commented-box__item" >
+                        <
+                        div class = "commented-box__item-user" >
+                        <
+                        div class = "commented-box__item-avatar" >
+                        <
+                        img src = "${userCmt.avatar}"
+                    alt = "" >
+                        <
+                        /div> <
+                    div class = "commented-box__item-info" >
+                        <
+                        div class = "wrap" >
+                        <
+                        div class = "comented-box__item-content" >
+                        <
+                        div class = "comented-box__item-name" >
+                        $ { userCmt.fullName } <
+                        /div> <
+                    div class = "comented-box__item-text" >
+                        $ { cmt.content } <
+                        /div> < /
+                    div > <
+                        /div> <
+                    div class = "commented-box__item-reaction"
+                    data - index = "${cmt.id}" >
+                        <
+                        span class = " ${users[this.idUser].cmtLiked.includes(cmt.id.toString()) ? 'active' : ''} commented-box__item-reaction--like" > Thích < /span>• <
+                    span class = "commented-box__item-reaction--respond" > Phản hồi < /span> < /
+                    div > <
+                        div style = "display: ${cmt.like ? 'flex' : 'none'}"
+                    class = "commented-count-reaction" >
+                        <
+                        i class = "fas fa-thumbs-up" > < /i> <
+                    span > $ { cmt.like } < /span> < /
+                    div > <
+                        /div> <
+                    div data - index = "${cmt.id}"
+                    class = "commented-box__item-delete"
+                    style = "display: ${this.idUser == cmt.idUser ? 'block' : 'none'}" >
+                        <
+                        i class = "fad fa-trash-alt" > < /i> < /
+                    div > <
+                        /div>
+
+                    <
+                    div style = "display: ${cmtSubs.length ? 'block' : 'none'}"
+                    class = "commented-box__item-respond-list" >
+                        $ {
+                            cmtSubs.map((cmt2, index) => {
+                                let cmtsub = ''
+                                const user = users.find((user) => {
+                                    return cmt2.idUser === user.id
+                                })
+
+                                return `
+                            < div class="commented-box__item-user sub" >
                                                                 <div class="commented-box__item-avatar">
                                                                     <img src="${user.avatar}" alt="">
                                                                 </div>
@@ -391,55 +406,56 @@ const app = (() => {
                                                                 <div style="display: ${this.idUser == cmt2.idUser ? 'block' : 'none'}" data-index="${cmt2.id}" class="commented-box__item-delete">
                                                                     <i class="fad fa-trash-alt"></i>
                                                                 </div>
-                                                            </div>
-                                                            `
-                                                            
-                                                        }).join('')
-                                                    }
-                                                </div>
-    
-                                            </div>
-                                            `
+                                                            </div >
+    `
+
+                            }).join('')
+                        } <
+                        /div>
+
+                    <
+                    /div>
+                    `
                                         }).join('')
                                     }
     
-                                </div>
-                            </div>
-                            html3
-                        </div>
-                    </div>
-                    `
+                                </div >
+                            </div >
+    html3
+                        </div >
+                    </div >
+    `
                 }
             })
             const component = $('.my-wall').style.display === 'block' ? newfWall : newfContainer
             if (htmls) {} else {
                 htmls = `
-                    <div class="newfeed-list--no-tus">
-                        Hiện chưa có bài viết nào.
-                    </div>
-                `
+    < div class="newfeed-list--no-tus" >
+        Hiện chưa có bài viết nào.
+                    </div >
+    `
             }
             component.innerHTML = htmls
             this.showInfoUser()
         },
-        newPost(content, bg){
+        newPost(content, bg) {
             const obj = {
-                    id: newfeeds.length,
-                    idUser: this.idUser,
-                    time: 0,
-                    bg: bg,
-                    content: content,
-                    like: 0,
-                    cmt: 0,
-                    share: 0,
-                    deleted: false,
+                id: newfeeds.length,
+                idUser: this.idUser,
+                time: 0,
+                bg: bg,
+                content: content,
+                like: 0,
+                cmt: 0,
+                share: 0,
+                deleted: false,
             }
-            
+
             newfeeds.unshift(obj)
             localStorage.setItem('newfeeds', JSON.stringify(newfeeds))
             this.render()
         },
-        newCmt(content, idPost){
+        newCmt(content, idPost) {
             const obj = {
                 id: comments.length,
                 idUser: this.idUser,
@@ -453,7 +469,7 @@ const app = (() => {
             localStorage.setItem('comments', JSON.stringify(comments))
             this.render()
         },
-        newSubCmt(content, idPost, idParentCmt){
+        newSubCmt(content, idPost, idParentCmt) {
             const obj = {
                 id: comments.length,
                 idUser: this.idUser,
@@ -469,13 +485,13 @@ const app = (() => {
             localStorage.setItem('comments', JSON.stringify(comments))
             this.render()
         },
-        renderMess(){
+        renderMess() {
             const messengers = JSON.parse(localStorage.getItem('messengers')) || []
             const htmls = messengers.map(mess => {
                 if (mess.idUser != this.idUser && mess.endMess) {
                     const user = users.find(user => user.id === mess.idUser)
                     return `
-                    <li class="mess-item">
+    < li class="mess-item" >
                         <div class="mess-item__active">
                             <img src="${user.avatar}" alt="" class="mess-item__avatar">
                         </div>
@@ -493,13 +509,13 @@ const app = (() => {
                                 </span> 
                             </div>
                         </div>
-                    </li>
-                    `
+                    </li >
+    `
                 }
             }).join('')
             $('.mess-list').innerHTML = htmls
         },
-        handle(){
+        handle() {
             const _this = this
 
             //container <-> wall
@@ -552,17 +568,18 @@ const app = (() => {
             }
 
             //overplay
-            function closeOverplay(){
+            function closeOverplay() {
                 overplay.style.display = 'none'
                 document.body.style.overflow = 'auto'
             }
-            function showOverplay(){
+
+            function showOverplay() {
                 overplay.style.display = 'flex'
                 document.body.style.overflow = 'hidden'
             }
 
             //đăng xuất
-            $('.nav-logout').onclick = function(){
+            $('.nav-logout').onclick = function() {
                 users.forEach((user) => {
                     user.isLogin = false
                 })
@@ -577,7 +594,7 @@ const app = (() => {
                 checkSubmit()
             }
             newPostBtns.forEach((newPostBtn) => {
-                newPostBtn.onclick = function(){
+                newPostBtn.onclick = function() {
                     showBox()
                 }
             })
@@ -587,7 +604,7 @@ const app = (() => {
             }
 
             //clear post box
-            function clearNewPost(){
+            function clearNewPost() {
                 textAreaBox.value = null
                 imgPostBox.src = ''
             }
@@ -605,10 +622,10 @@ const app = (() => {
                     const delPost = e.target.closest('.delete-post')
                     const showHideCmt = e.target.closest('.show-hide-cmt')
                     const deleteCmt = e.target.closest('.commented-box__item-delete')
-                    
-    
+
+
                     checkLiked = (btn, action, arr, id) => {
-                        
+
                         if (btn.classList.contains('active')) {
                             btn.classList.remove('active')
                             arr.find(item => item.id == id).like -= 1
@@ -621,11 +638,11 @@ const app = (() => {
                             btn.classList.add('active')
                             arr.find(item => item.id == id).like += 1
                             users[this.idUser][action].includes(id) ?
-                            null :
-                            users[this.idUser][action].push(id)
+                                null :
+                                users[this.idUser][action].push(id)
                         }
                     }
-    
+
                     if (likeBtn) {
                         const id = likeBtn.parentElement.dataset.index
                         checkLiked(likeBtn, "postLiked", newfeeds, id)
@@ -633,7 +650,7 @@ const app = (() => {
                         localStorage.setItem('newfeeds', JSON.stringify(newfeeds))
                         localStorage.setItem('users', JSON.stringify(users))
                     }
-    
+
                     if (likeCmtBtn) {
                         const id = likeCmtBtn.parentElement.dataset.id || likeCmtBtn.parentElement.dataset.index
                         checkLiked(likeCmtBtn, "cmtLiked", comments, id)
@@ -641,23 +658,23 @@ const app = (() => {
                         localStorage.setItem('comments', JSON.stringify(comments))
                         localStorage.setItem('users', JSON.stringify(users))
                     }
-    
+
                     if (respCmtBtn) {
                         respCmtBtn.classList.toggle('active')
                         const cmtBox = respCmtBtn.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.querySelector('.newsfeed__comment-input')
                         cmtBox.focus()
                     }
-    
+
                     if (moreBtn) {
                         const moreList = moreBtn.querySelector('.newsfeed__info-setting-list')
                         moreList.classList.toggle('active')
                     }
-                    
+
                     if (cmtBtn) {
                         const inp = cmtBtn.parentElement.parentElement.querySelector('.newsfeed__comment-input')
                         inp.focus()
                     }
-    
+
                     if (delPost) {
                         const id = Number.parseInt(delPost.parentElement.parentElement.dataset.index)
                         cuteAlert({
@@ -666,8 +683,8 @@ const app = (() => {
                             message: "Bạn chắc chắn muốn xoá bài viết này?",
                             confirmText: "Xoá",
                             cancelText: "Huỷ"
-                        }).then((e)=> {
-                            if (e){
+                        }).then((e) => {
+                            if (e) {
                                 newfeeds.forEach((newfeed, index) => {
                                     if (newfeed.id == id) {
                                         newfeeds[index].deleted = true
@@ -678,7 +695,7 @@ const app = (() => {
                             }
                         })
                     }
-    
+
                     if (editPost) {
                         _this.editMode = true;
                         editPost.classList.add('active')
@@ -691,10 +708,10 @@ const app = (() => {
                         })
                         showBox()
                     }
-    
-                    if(showHideCmt) {
+
+                    if (showHideCmt) {
                         const boxCmt = showHideCmt.parentElement.parentElement.querySelector('.commented-box')
-                        if (boxCmt.classList.contains('active')){
+                        if (boxCmt.classList.contains('active')) {
                             showHideCmt.querySelector('span').innerHTML = 'Xem thêm'
                             boxCmt.classList.remove('active')
                         } else {
@@ -702,7 +719,7 @@ const app = (() => {
                             boxCmt.classList.add('active')
                         }
                     }
-    
+
                     if (deleteCmt) {
                         const id = deleteCmt.dataset.index
                         cuteAlert({
@@ -711,8 +728,8 @@ const app = (() => {
                             message: "Bạn chắc chắn muốn xoá bình luận này?",
                             confirmText: "Xoá",
                             cancelText: "Huỷ"
-                        }).then((e)=> {
-                            if (e){
+                        }).then((e) => {
+                            if (e) {
                                 comments.forEach((comment, index) => {
                                     if (comment.id == id || comment.parentIdCmt == id) {
                                         comments[index].deleted = true
@@ -729,7 +746,7 @@ const app = (() => {
             //check có đăng bài được hay không
             function checkSubmit() {
                 const value = textAreaBox.value
-                if (value || imgPostBox.style.display != 'none'){
+                if (value || imgPostBox.style.display != 'none') {
                     postBtn.classList.add('btn-active')
                 } else {
                     postBtn.classList.remove('btn-active')
@@ -768,22 +785,22 @@ const app = (() => {
                 deleteImg.style.display = 'none'
                 checkSubmit()
             }
-            
+
             //check xem có text hay không
-            textAreaBox.oninput = function(){
+            textAreaBox.oninput = function() {
                 checkSubmit()
             }
 
             //đăng bài
             postBtn.onclick = () => {
-        
+
                 if (_this.editMode) {
                     const editPost = $('.edit-post.active')
                     if (editPost) {
                         const id = Number.parseInt(editPost.parentElement.parentElement.dataset.index)
                         const content = textAreaBox.value.trim()
                         const bg = imgPostBox.src
-    
+
                         newfeeds.forEach((newfeed, index) => {
                             if (newfeed.id == id) {
                                 newfeed.content = content
@@ -804,7 +821,7 @@ const app = (() => {
                 }
                 closeOverplay()
                 clearNewPost()
-                
+
             }
 
             //window scroll
@@ -815,7 +832,7 @@ const app = (() => {
                     const height = $('.my-wall__top').offsetHeight
                     const wallFriends = $('.my-wall__main-left')
                     const wallFriendsBottom = wallFriends.getBoundingClientRect().bottom
-                    
+
                     const scrollTop = window.scrollY || document.documentElement.scrollTop
                     if (scrollTop > height) {
                         Object.assign(moreList.style, {
@@ -869,28 +886,26 @@ const app = (() => {
                         const idPost = Number.parseInt(inp.dataset.index)
                         const content = inp.value.trim()
 
-                       if (content) {
-                           this.newCmt(content, idPost)
-                           inp.focus()
-                           inp.value = null
-                       }
+                        if (content) {
+                            this.newCmt(content, idPost)
+                            inp.focus()
+                            inp.value = null
+                        }
                     }
                 })
             }
 
             //resp
-            $('.nav-left-layout').onclick = function(){
+            $('.nav-left-layout').onclick = function() {
                 $('.container-left').classList.toggle('active')
                 this.classList.toggle('active')
             }
-            
+
         },
-        start(){
+        start() {
             this.renderMess()
             this.render()
             this.handle()
         }
     }
 })().start()
-
-

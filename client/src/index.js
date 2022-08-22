@@ -16,6 +16,10 @@ app.get('/home', (req, res) => {
     res.sendFile(process.cwd() + '/src/public/html/pages/home.html')
 })
 
+app.get('/list-user-search', (req, res) => {
+    res.sendFile(process.cwd() + '/src/public/html/pages/list-user-search.html')
+})
+
 app.listen(port, () => {
     console.log(`FaceBook client listening at http://localhost:${port}`)
 })

@@ -1,10 +1,6 @@
-import { postRequest, getRequest, getCookieByName } from '/js/fetch-api.js';
+import { redirectRequest } from '/js/common.js';
 
 
-document.querySelector('.header-main').onclick = function() {
-    console.log('fjsinofsifsd')
-}
-console.log('sdafsdfa')
 $('#search-input').on('keydown', async function(e) {
     console.log('keyyyy: ', e.key)
     if (e.key == 'Enter') {
@@ -16,7 +12,22 @@ $('#search-input').on('keydown', async function(e) {
         const params = {
             inputname: inputValue
         }
-        const listUser = await getRequest('users/search', params)
-        console.log('this User', listUser)
+        const requestObj = {
+            method: 'GET',
+            endpoint: 'users/search',
+            param: params
+        }
+        localStorage.setItem('redirect_request', JSON.stringify(requestObj))
+        location.href = '/list-user-search'
+
     }
+})
+
+
+
+$('#logout-btn').on('click', async() => {
+    console.log('LOGOUTTT')
+    const logOutResult = await getRequest('auth/logout')
+    if (logOutResult.statusCode !== 200) alert(`logout failure: ${logOutResult.message}`)
+    else location.href = '/'
 })

@@ -20,3 +20,7 @@ export const decodeAccessToken = () => {
     return JSON.parse(jsonPayload);
     // return decodedToken
 }
+
+export const redirectRequest = (requestObj) => {
+    localStorage.setItem('redirect_request', JSON.stringify(requestObj))
+}
