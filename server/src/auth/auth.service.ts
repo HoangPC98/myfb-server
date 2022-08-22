@@ -45,7 +45,6 @@ export class AuthService {
       throw new UnauthorizedException(`Google verify token on google failure`);
     }
 
-    // console.log('...',  this.oAuth2Client.)
     const {
       hd: domain,
       email_verified,
@@ -54,11 +53,8 @@ export class AuthService {
       picture,
     } = ggLoginTicket.getPayload();
 
-    console.log('...', ggLoginTicket.getPayload());
     if (!email_verified) {
-      this.logger.error(
-        ` domain ${domain} not authorized or email ${email} not verified`,
-      );
+      this.logger.error(`your email address: ${email} are not verified`);
       throw new UnauthorizedException();
     }
     let foundExistingUser;
@@ -120,10 +116,23 @@ export class AuthService {
 
     const tokens = await this.getToken(payload);
 
-    return {
-      accessToken: tokens.accessToken,
-      refreshToken: tokens.refreshToken,
-    };
+    return tokens;
+  }
+
+  async getNewRefreshToken(userPayload: JwtUserPayload) {
+    console.log(`userPayload`, userPayload);
+    return await this.getToken(userPayload);
+  }
+
+  async logOut(userlogin: JwtUserPayload): Promise<any> {
+    try {
+      console.log(`User ${userlogin.given_name} has logout`);
+
+      return await this.loginSessionRepo.softDelete({ user_id: userlogin.uid });
+    } catch (err) {
+      this.logger.error('Logout Error: ', err.message);
+      throw new Error(err.message);
+    }
   }
 
   private async getToken(payload) {
@@ -167,18 +176,6 @@ export class AuthService {
       avatar_url: userRec.avatar_url,
       iat: Math.floor(Date.now() / 1000),
     };
-  }
-
-  async logOut(userlogin: JwtUserPayload): Promise<any> {
-    // const decodeToken = this.jwtService.decode(token);
-    try {
-      console.log(`User ${userlogin.given_name} has logout`);
-
-      return await this.loginSessionRepo.delete({ user_id: userlogin.uid });
-    } catch (err) {
-      this.logger.error('Logout Error: ', err.message);
-      throw new Error(err.message);
-    }
   }
 
   async updateUser(user: User, payload): Promise<User> {

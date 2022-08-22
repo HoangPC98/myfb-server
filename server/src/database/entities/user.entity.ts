@@ -54,10 +54,10 @@ export class User extends CustomBaseEntity {
   @Column({ type: 'enum', enum: Gender, default: null, nullable: true })
   gender: Gender;
 
-  @Column({ nullable: false, default: DEFAULT_AVATAR_URL })
+  @Column({ nullable: true, default: null })
   avatar_url: string;
 
-  @Column()
+  @Column({ nullable: true, default: null })
   cover_photo_url: string;
 
   @Column({ unique: true })

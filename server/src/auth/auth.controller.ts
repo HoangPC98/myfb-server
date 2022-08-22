@@ -1,6 +1,7 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
+import { JwtUserPayload } from 'src/types/data-types/auth-user.type';
 import { AuthService } from './auth.service';
-import { GetCurrentUser } from './decorators/getUid.derator';
+import { GetCurrentUID, GetCurrentUser } from './decorators/getUid.derator';
 import { Public } from './decorators/public-auth.decorator';
 import { LoginGoogleDto } from './dto/login-gg.dto';
 
@@ -21,7 +22,15 @@ export class AuthController {
     };
   }
 
+  @Get('refresh-token')
+  async getRefreshToken(@GetCurrentUser() user: JwtUserPayload) {
+    return {
+      response: await this.authService.getNewRefreshToken(user),
+    };
+  }
+
+  @Get('logout')
   async logOut(@GetCurrentUser() user) {
-    return await this.logOut(user);
+    return await this.authService.logOut(user);
   }
 }
