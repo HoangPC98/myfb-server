@@ -54,3 +54,29 @@ export enum QueryOption {
   UseRepository = ' repository',
   UseQueryBuilder = 'queryBuilder',
 }
+
+export enum AuthType {
+  GoogleAuth = 'google_auth',
+  UsernamePasswordAuth = 'username_password_auth',
+  OtpAuth = 'otp_auth',
+}
+
+export enum UserStatus {
+  Active = 'active',
+  Inactive = 'inactive',
+  Locked = 'locked',
+}
+
+export enum Gender {
+  Male = 'male',
+  Female = 'female',
+  Other = 'other',
+}
+
+export enum OtpType{
+  VerifyEmailOrPhone = 'verify_email_phone',
+  ForgotPassword = 'forgot_password',
+  MfaAuthen = 'mfa_authen',
+  WrongOtp = 'wrong_otp',
+}
+

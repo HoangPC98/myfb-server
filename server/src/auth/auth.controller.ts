@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { GetCurrentUser } from './decorators/getUid.derator';
 import { Public } from './decorators/public-auth.decorator';
 import { LoginGoogleDto } from './dto/login-gg.dto';
+import { SignUpDto } from './dto/sign-up.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -23,5 +24,25 @@ export class AuthController {
 
   async logOut(@GetCurrentUser() user) {
     return await this.logOut(user);
+  }
+
+  @Public()
+  @Post('signup/fillout-data')
+  async signUp(@Body() signUpData: SignUpDto): Promise<any> {
+    const result = await this.authService.signUpStep1(signUpData)
+    return {
+      code: 201,
+      result: `OTP has been sent to ${signUpData.email_or_phone}`
+    };
+  }
+
+  @Public()
+  @Post('otp/verify-submission')
+  async verifyOtpSubmission(@Body() otpBodySubmission){
+    const response = await this.authService.verifyOtpSubmission(otpBodySubmission.otp_code, otpBodySubmission.email_or_phone, otpBodySubmission.otp_type)
+    return {
+      code: 200,
+      result: response || 'ok'
+    }
   }
 }

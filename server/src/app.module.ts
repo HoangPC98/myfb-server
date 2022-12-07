@@ -4,7 +4,6 @@ import configuration from './config/configuration';
 import { DatabaseModule } from './database/database.module';
 import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
-import * as redisStore from 'cache-manager-redis-store';
 // import { AuthGuardLogin } from './auth/gaurds/common-auth.guard';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtAuthGuard } from './auth/gaurds/jwt-guard';
@@ -15,6 +14,8 @@ import { ReactionModule } from './resources/reaction/reaction.module';
 import { CommentModule } from './resources/comment/comment.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+
+import * as redisStore from 'cache-manager-redis-store';
 
 @Module({
   imports: [
@@ -32,6 +33,11 @@ import { join } from 'path';
         },
       }),
     }),
+    // CacheModule.register({
+    //   store: redisStore, 
+    //   host: process.env.REDIS_HOST || 'localhost',
+    //   port: +process.env.REDIS_HOST || 6379
+    // }),
     DatabaseModule,
     AuthModule,
     UserModule,
@@ -45,6 +51,7 @@ import { join } from 'path';
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
     },
+    
   ],
 })
 export class AppModule {}

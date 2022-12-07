@@ -1,6 +1,8 @@
 import {
+  BadRequestException,
   Inject,
   Injectable,
+  InternalServerErrorException,
   Logger,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -12,9 +14,19 @@ import {
 } from 'google-auth-library';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { LoginSession } from 'src/database/entities/login-session.entity';
-import { Gender, User } from 'src/database/entities/user.entity';
+import { UserSession } from 'src/database/entities/user-session.entity';
+import { User } from 'src/database/entities/user.entity';
 import { JwtUserPayload } from 'src/types/data-types/auth-user.type';
+import { AuthType, Gender, OtpType, UserStatus } from 'src/types/enum-types/common.enum';
+import { checkEmailOrPhone } from 'src/utils/checker.util';
+import { MAX_WRONG_OTP_ENTRY, OTP_SECOND_REFRESH } from 'src/constants/common.constant';
+import { SignUpDto } from './dto/sign-up.dto';
+import { userInfo } from 'os';
+import { smsSender } from 'src/common-services/send-sms.service';
+import { CachingService } from 'src/caching/caching.service';
+import bcrypt from 'bcrypt';
+import { ColdObservable } from 'rxjs/internal/testing/ColdObservable';
+import { otpService } from 'src/common-services/otp-config.service';
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
@@ -23,14 +35,70 @@ export class AuthService {
   constructor(
     private readonly configService: ConfigService,
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
-    @InjectRepository(LoginSession)
-    private loginSessionRepo: Repository<LoginSession>,
-    private readonly jwtService: JwtService, // private readonly userRepo: UserRepository,
+    private readonly userRepo: Repository<User>,
+    @InjectRepository(UserSession)
+    private userSessionRepo: Repository<UserSession>,
+    private readonly jwtService: JwtService,
+    private readonly cacheManager: CachingService,
   ) {
     const { clientId, clientSecret } = this.configService.get('ggAuth');
     this.oAuth2Client = new GoogleOAuth2Client(clientId, clientSecret);
   }
+
+  
+
+  async signUpStep1(signUpData: SignUpDto) {
+    let emailOrPhone = checkEmailOrPhone(signUpData.email_or_phone)
+    const userRec = await this.userRepo.createQueryBuilder().where(`${emailOrPhone} = :emp`, {emp: signUpData.email_or_phone}).execute()
+    const userHoldForVerifying = await this.cacheManager.getter(`AccVerifying_${signUpData.email_or_phone}`)
+    console.log('BEWBEBEB', userRec, userHoldForVerifying)
+    if(userRec.length > 0 || userHoldForVerifying !== null)
+      return new BadRequestException(`${emailOrPhone} ${signUpData.email_or_phone} already existed`)
+
+    if(emailOrPhone == 'phone_number'){
+      try {
+        await this.cacheManager.setter(
+          `AccVerifying_${signUpData.email_or_phone}`,
+          `${JSON.stringify({...signUpData, otpSecret: otpService.generateSecret()})}`, 
+          OTP_SECOND_REFRESH*10
+        )
+        const newOtp = await this.otpGenerator(signUpData.email_or_phone, OtpType.VerifyEmailOrPhone, {})
+        return smsSender(signUpData.email_or_phone, `FB-${newOtp} is your ${emailOrPhone} verification code`)
+        
+      } catch (err) {
+        return new BadRequestException(`Cannot send SMS to number ${signUpData.email_or_phone}`)
+      }      
+    }
+  }
+
+  async verifyOtpSubmission(otpCode: string, emailOrPhone: string, otpType: OtpType){
+    var checkOtp = await this.otpCheck(otpCode, emailOrPhone, otpType)
+    let emailOrPhoneT = checkEmailOrPhone(emailOrPhone)
+    console.log('checkout_at --------', checkOtp)
+    if(checkOtp.isValid == true){
+      if(otpType == OtpType.VerifyEmailOrPhone){
+        let thisSignUpDataHolding = await this.cacheManager.getter(`AccVerifying_${emailOrPhone}`);
+        if(thisSignUpDataHolding == null)
+          return new BadRequestException(`SignUp session expired`)
+        let thisSignUpDataHoldingObj: SignUpDto = JSON.parse(thisSignUpDataHolding);
+        const newUser = new User();
+        Object.assign(newUser, thisSignUpDataHoldingObj)
+        newUser.given_name = thisSignUpDataHoldingObj.first_name + ' ' +thisSignUpDataHoldingObj.last_name;
+        newUser[emailOrPhoneT] = emailOrPhone;
+        newUser.auth_type = AuthType.UsernamePasswordAuth;
+        try {
+          newUser.password = await bcrypt.hash(thisSignUpDataHoldingObj.password, +process.env.HASH_PSW_SALTROUND || 10);
+          newUser.secret = otpService.generateSecret();
+          await this.userRepo.save(newUser)
+        } catch (err) {
+          this.logger.error(err);
+          return new InternalServerErrorException('Error when verifying OTP')
+        }
+      }
+    }
+    return checkOtp
+  }
+
   async loginGoogle(ggToken: string, uuid: string) {
     const { clientId, authorizedDomain } = this.configService.get('ggAuth');
 
@@ -62,7 +130,7 @@ export class AuthService {
       throw new UnauthorizedException();
     }
     let foundExistingUser;
-    foundExistingUser = await this.userRepository.findOne({
+    foundExistingUser = await this.userRepo.findOne({
       where: { email: email },
     });
 
@@ -85,9 +153,9 @@ export class AuthService {
       newUser.avatar_url = picture;
 
       console.log('user....', newUser);
-      const getNewUser = await this.userRepository.save(newUser);
+      const getNewUser = await this.userRepo.save(newUser);
       foundExistingUser = getNewUser;
-      userInfo = await this.userRepository.findOne({
+      userInfo = await this.userRepo.findOne({
         where: { id: getNewUser.id },
         relations: ['Profile'],
       });
@@ -98,22 +166,22 @@ export class AuthService {
       );
     }
 
-    const checkUserLoginNewDevice = await this.loginSessionRepo.findOne({
+    const checkUserLoginNewDevice = await this.userSessionRepo.findOne({
       where: { user_id: foundExistingUser.id, uuid: uuid },
       withDeleted: true,
     });
 
     // if user not login this device with this uuid before
     if (!checkUserLoginNewDevice) {
-      const newLoginUserNewDevice = new LoginSession();
+      const newLoginUserNewDevice = new UserSession();
       newLoginUserNewDevice.user_id = foundExistingUser.id;
       newLoginUserNewDevice.uuid = uuid;
 
-      await this.loginSessionRepo.save(newLoginUserNewDevice);
+      await this.userSessionRepo.save(newLoginUserNewDevice);
     } // if login this device with user_id and uuid before
     else {
       checkUserLoginNewDevice.deletedAt = null;
-      this.loginSessionRepo.save(checkUserLoginNewDevice);
+      this.userSessionRepo.save(checkUserLoginNewDevice);
     }
 
     const payload = await this.getJwtPayload(foundExistingUser, uuid);
@@ -174,7 +242,7 @@ export class AuthService {
     try {
       console.log(`User ${userlogin.given_name} has logout`);
 
-      return await this.loginSessionRepo.delete({ user_id: userlogin.uid });
+      return await this.userSessionRepo.delete({ user_id: userlogin.uid });
     } catch (err) {
       this.logger.error('Logout Error: ', err.message);
       throw new Error(err.message);
@@ -190,8 +258,79 @@ export class AuthService {
       isModified = true;
     }
 
-    isModified && this.loginSessionRepo.save(user);
+    isModified && this.userSessionRepo.save(user);
 
     return user;
+  }
+
+  private async otpGenerator(emailOrPhoneNumber: string, otpType: OtpType, otpOptions:any) {
+   
+    let emailOrPhone = checkEmailOrPhone(emailOrPhoneNumber)
+    let whereObj = {}
+    if (emailOrPhone === 'email')
+      whereObj['email'] = emailOrPhoneNumber;
+    else
+      whereObj['phone_number'] = emailOrPhoneNumber
+    var thisUser = await this.userRepo.findOne({ where: whereObj })
+    var thisSecret: string;
+    if(!thisUser && otpType === OtpType.VerifyEmailOrPhone){
+      thisSecret = await this.cacheManager.getter(`AccVerifying_${emailOrPhoneNumber}`)
+      thisSecret = JSON.parse(thisSecret).otpSecret;
+    }
+    else
+      thisSecret = thisUser.secret;
+    
+    const otpByServer = otpService.generate(thisSecret)
+    console.log(`>>> OTP Generated: ${otpByServer}, ${thisSecret}`)
+    return otpByServer;
+  }
+
+  private async otpCheck(otpCode: string, emailOrPhoneNumber: string, otpType: OtpType) {
+    const checkOtpResult = { isValid: true, message: 'OTP is verified successfully' }
+    let emailOrPhone = checkEmailOrPhone(emailOrPhoneNumber)
+    try {
+      let userRec = await User.createQueryBuilder('user').where(`${emailOrPhone} = ${emailOrPhoneNumber}`).execute()
+      console.log(`>>> OTP Check`, userRec)
+      let secret: string;
+      if (userRec.length == 0 && otpType == OtpType.VerifyEmailOrPhone) {
+        let thisHodingCache = await this.cacheManager.getter(`AccVerifying_${emailOrPhoneNumber}`)
+        if(!thisHodingCache)
+          secret = otpService.generateSecret();
+        else
+          secret = JSON.parse(thisHodingCache).otpSecret
+      }
+      console.log('checking otp ===', otpCode, secret, emailOrPhoneNumber)
+      const isValidOtp = otpService.check(otpCode, secret)
+      console.log(' >>>> OTP CHECKING', isValidOtp, otpCode, secret)
+      if (!isValidOtp) {
+        const foundWrongOtpSubmit = await this.cacheManager.getter(`WrongOtpSubmit_${emailOrPhoneNumber}`)
+        if (foundWrongOtpSubmit ==null) {
+          await this.cacheManager.setter(`WrongOtpSubmit_${emailOrPhoneNumber}`, '1', 3600*24)
+          checkOtpResult.isValid = false,
+            checkOtpResult.message = `Sai OTP, tài khoản sẽ bị khoá sau ${MAX_WRONG_OTP_ENTRY} lần nhập sai`
+        }
+        else {
+          const wrong_otp_time_current = await this.cacheManager.getter(`WrongOtpSubmit_${emailOrPhoneNumber}`)
+          await this.cacheManager.setter(`WrongOtpSubmit_${emailOrPhoneNumber}`, String(wrong_otp_time_current+1), 3600*24)
+          checkOtpResult.isValid = false,
+          checkOtpResult.message = `Sai OTP, còn ${MAX_WRONG_OTP_ENTRY - +wrong_otp_time_current} lần thử`
+
+          if (+wrong_otp_time_current >= 5) {
+            await User
+            .createQueryBuilder()
+            .update(User)
+            .set({ user_status: UserStatus.Locked })
+            .where(`${emailOrPhone} = :emp `, {emp: emailOrPhoneNumber })
+            .execute()
+            checkOtpResult.message = `Bạn đã nhập sai mã OTP quá 5 lần, tài khoản của bạn đã bị khoá`
+          }
+        }
+      }
+      console.log('OTP reuilst...',checkOtpResult)
+      return checkOtpResult;
+    } catch (err) {
+      console.log('ERROR: >>', err);
+    }
+
   }
 }

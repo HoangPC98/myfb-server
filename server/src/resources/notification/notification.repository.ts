@@ -1,6 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { LoginSession } from 'src/database/entities/login-session.entity';
+import { UserSession } from 'src/database/entities/user-session.entity';
 import { NotificationReceive } from 'src/database/entities/notification-receive.entity';
 import { Notifications } from 'src/database/entities/notification.entity';
 import { User } from 'src/database/entities/user.entity';
@@ -10,8 +10,8 @@ import { getManager, Repository } from 'typeorm';
 @Injectable()
 export class NotificationRepositoty {
   constructor(
-    @InjectRepository(LoginSession)
-    private readonly loginSessionRepo: Repository<LoginSession>,
+    @InjectRepository(UserSession)
+    private readonly loginSessionRepo: Repository<UserSession>,
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
   ) {}
@@ -19,7 +19,7 @@ export class NotificationRepositoty {
   async getFcmToken(user_id: number): Promise<Array<string>> {
     const rec = await this.loginSessionRepo.find({ user_id });
     console.log('rec>>>', user_id, rec);
-    return rec.map((item) => item.fcm_token);
+    return rec.map((item) => item.token);
   }
 
   async getUser(user_id: number): Promise<User> {

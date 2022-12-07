@@ -4,15 +4,17 @@ import { AuthController } from './auth.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/database/entities/user.entity';
 
-import { LoginSession } from 'src/database/entities/login-session.entity';
+import { UserSession } from 'src/database/entities/user-session.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserModule } from 'src/resources/user/user.module';
 import { JwtStrategy } from './strategies/jwt-accesstoken.strategy';
+import { CachingService } from 'src/caching/caching.service';
+import { CachingModule } from 'src/caching/caching.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, LoginSession]),
+    TypeOrmModule.forFeature([User, UserSession]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -23,6 +25,7 @@ import { JwtStrategy } from './strategies/jwt-accesstoken.strategy';
         },
       }),
     }),
+    CachingModule,
     UserModule,
   ],
   controllers: [AuthController],
