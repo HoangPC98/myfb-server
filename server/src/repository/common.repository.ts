@@ -64,3 +64,18 @@ export const getEntityPagination = async (
     });
   }
 };
+export const updateEntityByField_Value = async (entity_type: EntityType, queryObj: object, payload: any) => {
+  let fields = Object.keys(queryObj)
+  let whereString = ''
+  let whereParam = {...queryObj}
+  fields.forEach(((field, idx)=>{
+    whereString += (idx>0? 'AND' : '') + `${field} = :${field}`
+  }))
+
+  return await getManager()
+    .createQueryBuilder(entity_type, entity_type)
+    .update(entity_type)
+    .set(payload)
+    .where(whereString, whereParam)
+    .execute();
+}

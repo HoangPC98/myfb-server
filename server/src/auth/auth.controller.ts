@@ -30,19 +30,13 @@ export class AuthController {
   @Post('signup/fillout-data')
   async signUp(@Body() signUpData: SignUpDto): Promise<any> {
     const result = await this.authService.signUpStep1(signUpData)
-    return {
-      code: 201,
-      result: `OTP has been sent to ${signUpData.email_or_phone}`
-    };
+    return result['response'] || result
   }
 
   @Public()
   @Post('otp/verify-submission')
   async verifyOtpSubmission(@Body() otpBodySubmission){
-    const response = await this.authService.verifyOtpSubmission(otpBodySubmission.otp_code, otpBodySubmission.email_or_phone, otpBodySubmission.otp_type)
-    return {
-      code: 200,
-      result: response || 'ok'
-    }
+    const result = await this.authService.verifyOtpSubmission(otpBodySubmission.otp_code, otpBodySubmission.email_or_phone, otpBodySubmission.otp_type)
+    return result
   }
 }

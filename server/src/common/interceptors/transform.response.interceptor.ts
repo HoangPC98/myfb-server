@@ -20,15 +20,17 @@ export class TransformResponseInterceptor<T>
     context: ExecutionContext,
     next: CallHandler,
   ): Observable<Response<any> | StreamableFile> {
+    let response: {code: number, result: any} 
     return next.handle().pipe(
       map((result) => {
         if (result instanceof StreamableFile) {
           return result;
         }
-        console.log('dara resources',result)
-
-        return result
+        result['code'] = result.statusCode || result.code;
+        delete result['statusCode'];
+        return result;
       }),
+    
     );
   }
 }

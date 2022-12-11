@@ -60,7 +60,7 @@ export class UsersRepository {
     return await this.userRepo.find();
   }
 
-  async updateUserByUID(entity_type: EntityType, uid: number, payload: any) {
+  async updateEntityByField_Value(entity_type: EntityType, uid: number, payload: any) {
     let whereString = 'user_id = :uid';
 
     if (entity_type === EntityType.User) {

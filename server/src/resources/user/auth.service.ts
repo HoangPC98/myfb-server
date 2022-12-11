@@ -98,12 +98,12 @@ export class AuthService {
     const isValidOtp = otpService.check(otpCode, secret)
     console.log(' >>>> OTP CHECKING', isValidOtp, emailOrPhoneNumber, otpCode, secret)
     var foundWrongOtpSubmit = await this.cacheManager.getter(`SsWrongOtpSubmit_${emailOrPhoneNumber}`)
-    let foundOtpSessionHolding = await  Promise.all([
+    let foundOtpSessionHolding = Promise.all([
       this.cacheManager.getter(`SsAccVerifying_${emailOrPhone}`),
       this.cacheManager.getter(`SsForgotPassword_${emailOrPhone}`)
     ])
-    if (foundOtpSessionHolding.length > 0)
-      return new BadRequestException(`SignUp session expired`)
+    if (foundOtpSessionHolding == null)
+      return new BadRequestException(`updateEntityByField_Value`)
 
     if (isValidOtp) {
       if (otpType == OtpType.VerifyEmailOrPhone) {
