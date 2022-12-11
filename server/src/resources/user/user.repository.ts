@@ -60,19 +60,7 @@ export class UsersRepository {
     return await this.userRepo.find();
   }
 
-  async updateEntityByField_Value(entity_type: EntityType, uid: number, payload: any) {
-    let whereString = 'user_id = :uid';
 
-    if (entity_type === EntityType.User) {
-      whereString = 'id = :uid';
-    }
-    return await getManager()
-      .createQueryBuilder(entity_type, entity_type)
-      .update(entity_type)
-      .set(payload)
-      .where(whereString, { uid })
-      .execute();
-  }
 
   async getListPostByUserId(user_id: number, isMine?: boolean) {
     const whereQuery = { owner_id: user_id };

@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Param, Patch, Post } from '@nestjs/common';
-import { GetCurrentUID } from 'src/auth/decorators/getUid.derator';
+import { GetCurrentUID } from 'src/auth/decorators/getRequest.decorator';
 import { AddFriendDto } from './dto/add-fr.dto';
 import { ReplyRequestDto } from './dto/reply-request.dto';
 import { FriendShipService } from './friend-ship.service';

@@ -1,6 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { GetCurrentUser } from './decorators/getUid.derator';
+import { GetCurrentUser } from './decorators/getRequest.decorator';
 import { Public } from './decorators/public-auth.decorator';
 import { LoginGoogleDto } from './dto/login-gg.dto';
 import { SignUpDto } from './dto/sign-up.dto';
@@ -30,7 +30,7 @@ export class AuthController {
   @Post('signup/fillout-data')
   async signUp(@Body() signUpData: SignUpDto): Promise<any> {
     const result = await this.authService.signUpStep1(signUpData)
-    return result['response'] || result
+    return result
   }
 
   @Public()

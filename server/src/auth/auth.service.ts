@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  forwardRef,
   Inject,
   Injectable,
   InternalServerErrorException,
@@ -19,14 +20,15 @@ import { User } from 'src/database/entities/user.entity';
 import { JwtUserPayload } from 'src/types/data-types/auth-user.type';
 import { AuthType, Gender, OtpType, UserStatus } from 'src/types/enum-types/common.enum';
 import { checkEmailOrPhone } from 'src/utils/checker.util';
-import { MAX_WRONG_OTP_ENTRY, OTP_SECOND_REFRESH } from 'src/constants/common.constant';
-import { SignUpDto } from './dto/sign-up.dto';
-import { smsSender } from 'src/common-services/send-sms.service';
+import { MAX_WRONG_OTP_ENTRY, OTP_SECOND_REFRESH, SERVER_DOMAIN } from 'src/constants/common.constant';
+// import { SignUpDto } from './dto/sign-up.dto';
 import { CachingService } from 'src/caching/caching.service';
 import bcrypt from 'bcrypt';
 import { otpService } from 'src/common-services/otp-config.service';
-import { authenticator } from 'otplib';
+// import { authenticator } from 'otplib';
 import { UserService } from 'src/resources/user/user.service'
+import { smsSender } from 'src/common-services/send-sms.service';
+import { mailSender } from 'src/common-services/send-mail.service';
 
 @Injectable()
 export class AuthService {
@@ -41,7 +43,8 @@ export class AuthService {
     private userSessionRepo: Repository<UserSession>,
     private readonly jwtService: JwtService,
     private readonly cacheManager: CachingService,
-    private readonly userService: UserService,
+    @Inject(forwardRef(() => UserService))
+    private userService: UserService,
   ) {
     const { clientId, clientSecret } = this.configService.get('ggAuth');
     this.oAuth2Client = new GoogleOAuth2Client(clientId, clientSecret);
@@ -49,14 +52,12 @@ export class AuthService {
 
 
 
-  async signUpStep1(signUpData: SignUpDto) {
+  async signUpStep1(signUpData) {
     let emailOrPhone = checkEmailOrPhone(signUpData.email_or_phone)
     const userRec = await this.userRepo.createQueryBuilder().where(`${emailOrPhone} = :emp`, { emp: signUpData.email_or_phone }).execute()
     const userHoldForVerifying = await this.cacheManager.getter(`SsAccVerifying_${signUpData.email_or_phone}`)
-    console.log('thisisss', userHoldForVerifying, userRec)
+    console.log('usersss', userHoldForVerifying, userRec)
     if (userRec.length > 0 || userHoldForVerifying) {
-      console.log('thisisss 222', userHoldForVerifying, userRec)
-
       return new BadRequestException(`${emailOrPhone} ${signUpData.email_or_phone} already existed`)
     }
 
@@ -67,7 +68,8 @@ export class AuthService {
           `${JSON.stringify({ ...signUpData, otpSecret: otpService.generateSecret() })}`,
           OTP_SECOND_REFRESH * 10
         )
-        const newOtp = await this.otpGenerator(signUpData.email_or_phone, OtpType.VerifyEmailOrPhone, {})
+        let emailOrPhone = checkEmailOrPhone(signUpData.email_or_phone);
+        const newOtp = await this.otpGenerator(signUpData.email_or_phone, OtpType.VerifyEmailOrPhone, emailOrPhone)
         smsSender(signUpData.email_or_phone, `FB-${newOtp} is your ${emailOrPhone} verification code`)
         return { code: 201, message: `OTP code has been send to number ${signUpData.email_or_phone}` }
 
@@ -78,6 +80,7 @@ export class AuthService {
   }
 
   async verifyOtpSubmission(otpCode: string, emailOrPhoneNumber: string, otpType: OtpType) {
+    console.log('odkaosdkkooasdkao')
     const checkOtpResult = { isValid: true, message: 'OTP is verified successfully' }
     let emailOrPhone = checkEmailOrPhone(emailOrPhoneNumber)
     var secret: string;
@@ -93,26 +96,24 @@ export class AuthService {
     }
     else
       secret = userRec[0].user_secret
-    console.log(' >>>> OTP CHECKING', emailOrPhoneNumber, otpCode, secret)
 
     const isValidOtp = otpService.check(otpCode, secret)
-    console.log(' >>>> OTP CHECKING', isValidOtp, emailOrPhoneNumber, otpCode, secret)
     var foundWrongOtpSubmit = await this.cacheManager.getter(`SsWrongOtpSubmit_${emailOrPhoneNumber}`)
-    let foundOtpSessionHolding = await  Promise.all([
-      this.cacheManager.getter(`SsAccVerifying_${emailOrPhone}`),
-      this.cacheManager.getter(`SsForgotPassword_${emailOrPhone}`)
+    let foundOtpSessionHolding = await Promise.all([
+      this.cacheManager.getter(`SsAccVerifying_${emailOrPhoneNumber}`),
+      this.cacheManager.getter(`SsForgotPassword_${emailOrPhoneNumber}`)
     ])
-    if (foundOtpSessionHolding.length > 0)
-      return new BadRequestException(`SignUp session expired`)
+    if (foundOtpSessionHolding.every(item => item == null))
+      return new BadRequestException(`OTP session expired`)
 
     if (isValidOtp) {
       if (otpType == OtpType.VerifyEmailOrPhone) {
-        let thisSignUpDataHolding = await this.cacheManager.getter(`SsAccVerifying_${emailOrPhone}`);
-        let thisSignUpDataHoldingObj: SignUpDto = JSON.parse(thisSignUpDataHolding);
+        let thisSignUpDataHolding = await this.cacheManager.getter(`SsAccVerifying_${emailOrPhoneNumber}`);
+        let thisSignUpDataHoldingObj = JSON.parse(thisSignUpDataHolding);
         const newUser = new User();
         Object.assign(newUser, thisSignUpDataHoldingObj)
         newUser.given_name = thisSignUpDataHoldingObj.first_name + ' ' + thisSignUpDataHoldingObj.last_name;
-        newUser[emailOrPhone] = emailOrPhone;
+        newUser[emailOrPhone] = emailOrPhoneNumber;
         newUser.auth_type = AuthType.UsernamePasswordAuth;
         try {
           newUser.password = await bcrypt.hash(thisSignUpDataHoldingObj.password, +process.env.HASH_PSW_SALTROUND || 10);
@@ -147,8 +148,7 @@ export class AuthService {
         }
       }
     }
-    console.log('OTP reuilst...', checkOtpResult)
-   
+
     return { code: checkOtpResult.isValid ? 200 : 401, ...checkOtpResult };
   }
 
@@ -317,9 +317,7 @@ export class AuthService {
     return user;
   }
 
-  private async otpGenerator(emailOrPhoneNumber: string, otpType: OtpType, otpOptions: any) {
-
-    let emailOrPhone = checkEmailOrPhone(emailOrPhoneNumber)
+  private async otpGenerator(emailOrPhoneNumber: string, otpType: OtpType, emailOrPhone: string) {
     let whereObj = {}
     if (emailOrPhone === 'email')
       whereObj['email'] = emailOrPhoneNumber;
@@ -336,10 +334,35 @@ export class AuthService {
 
     const otpByServer = otpService.generate(thisSecret)
     console.log(`>>> OTP Generated: ${otpByServer}, ${thisSecret}`)
-    return otpByServer;
+    return otpByServer
   }
 
-  private async otpCheck(otpCode: string, secret: string): Promise<boolean> {
-    return authenticator.check(otpCode, secret)
+  // private async otpCheck(otpCode: string, secret: string): Promise<boolean> {
+  //   return authenticator.check(otpCode, secret)
+  // }
+
+  async sendOtpVerification(emailOrPhoneNumber: string, otpType: OtpType) {
+    let emailOrPhone = checkEmailOrPhone(emailOrPhoneNumber)
+    if (otpType == OtpType.ForgotPassword) {
+      if(emailOrPhone === 'email') {
+        let thisUserSecret: string = (await this.userRepo.findOne({ email: emailOrPhoneNumber })).secret
+
+        let resetPswToken: string = this.jwtService.sign(
+          { email: emailOrPhoneNumber },
+          { secret: process.env.JWT_RESET_PSW_TOKEN_SECRET, expiresIn: process.env.TTL_RESET_PSW || '5m' }
+        )
+        console.log(resetPswToken)
+        let resetPswLink = `${SERVER_DOMAIN}:${process.env.SERVER_PORT}/users/reset-password?link=${resetPswToken}`
+        await mailSender(emailOrPhoneNumber, 'Reset Password Link', `Click the link below to reset your new password: ${resetPswLink}`)
+        return { statusCode: 200, message: `A Reset Password Link has been sent to email ${emailOrPhoneNumber}` }
+      }
+      else if(emailOrPhone === 'phone') {
+        const otpCode = await this.otpGenerator(emailOrPhoneNumber, otpType, emailOrPhone);
+        let msg = `FB-${otpCode} is your code reset password`
+        smsSender(emailOrPhoneNumber, msg)
+        return { statusCode: 200, message: `An OTP Code Reset Password has been sent to number ${emailOrPhoneNumber}` }
+      }
+    }
+
   }
 }

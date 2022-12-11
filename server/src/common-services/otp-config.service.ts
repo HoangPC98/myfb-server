@@ -11,4 +11,4 @@ authenticator.options = {
 
 const otpService = authenticator
 
-export {otpService}
+export { otpService }

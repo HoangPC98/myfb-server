@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -26,9 +26,10 @@ import { CachingModule } from 'src/caching/caching.module';
       }),
     }),
     CachingModule,
-    UserModule,
+    forwardRef(() => UserModule),
   ],
   controllers: [AuthController],
   providers: [AuthService, ConfigService, JwtStrategy],
+  exports: [AuthService]
 })
 export class AuthModule {}

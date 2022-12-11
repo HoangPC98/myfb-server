@@ -4,18 +4,15 @@ import { User } from 'src/database/entities/user.entity';
 import { EntityType, UserInfoType, UserStatus } from 'src/types/enum-types/common.enum';
 
 import { searchByUserNameUnicode } from 'src/utils/search-engine.util';
-import {
-  UpdateUserInfoDto,
-  UpdateUserPrivacyDto,
-  UpdateProfilePhoto,
-} from './dto/update-user.dto';
+
 import { UsersRepository } from './user.repository';
 import { updateEntityByField_Value } from 'src/repository/common.repository'
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UserService {
   constructor(private readonly userRepo: UsersRepository) { }
-
+  private readonly jwtService: JwtService;
   private readonly PREVIEW_FRIEND_ITEM_NUM = 6;
   private readonly PREVIEW_PHOTO_ITEM_NUM = 9;
 
@@ -128,6 +125,14 @@ export class UserService {
       return await updateEntityByField_Value(EntityType.User, queryObj, {status: status})
     } catch (error) {
       throw new BadRequestException('Error updating user status')
+    }
+  }
+
+  async changePasswordViaLinkEmail(linkEmail: string){
+    try {
+      const verifyLink = await this.jwtService
+    } catch (error) {
+      
     }
   }
 

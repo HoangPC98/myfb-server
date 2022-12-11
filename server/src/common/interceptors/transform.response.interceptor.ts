@@ -26,9 +26,12 @@ export class TransformResponseInterceptor<T>
         if (result instanceof StreamableFile) {
           return result;
         }
-        result['code'] = result.statusCode || result.code;
+        console.log(result);
+
+        result['code'] = result.statusCode;
+        console.log(result);
         delete result['statusCode'];
-        return result;
+        return result['response'] || result;
       }),
     
     );
