@@ -21,7 +21,7 @@ import * as redisStore from 'cache-manager-redis-store';
   imports: [
     ConfigModule.forRoot({ load: [configuration], isGlobal: true }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'public'),
+      rootPath: join(__dirname, 'public'),
     }),
     JwtModule.registerAsync({
       imports: [ConfigModule],

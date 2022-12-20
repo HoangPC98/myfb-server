@@ -6,11 +6,13 @@ import { ConfigService } from '@nestjs/config';
 import { TransformResponseInterceptor } from './common/interceptors/transform.response.interceptor';
 import * as admin from 'firebase-admin';
 import firebaseConfig from './resources/notification/config/fcm.config';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 // import firebaseConfig from './notification/firebaseConfig';
 
 async function bootstrap() {
   const logger = new Logger(bootstrap.name);
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.enableCors({
     exposedHeaders: ['Content-Disposition'],
@@ -30,7 +32,11 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
 
-  app.useGlobalInterceptors(new TransformResponseInterceptor());
+  // app.useGlobalInterceptors(new TransformResponseInterceptor());
+  console.log('>>>>>>>>>>>dirname: ' + __dirname)
+  app.useStaticAssets(join(__dirname, 'assets'));
+  app.setBaseViewsDir(join(__dirname, 'assets'));
+  app.setViewEngine('ejs');
 
   admin.initializeApp({ credential: admin.credential.cert(firebaseConfig) });
 

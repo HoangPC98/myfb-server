@@ -29,6 +29,7 @@ import { otpService } from 'src/common-services/otp-config.service';
 import { UserService } from 'src/resources/user/user.service'
 import { smsSender } from 'src/common-services/send-sms.service';
 import { mailSender } from 'src/common-services/send-mail.service';
+import { userInfo } from 'os';
 
 @Injectable()
 export class AuthService {
@@ -36,21 +37,41 @@ export class AuthService {
   private readonly oAuth2Client: GoogleOAuth2Client;
 
   constructor(
+    @InjectRepository(User) private readonly userRepo: Repository<User>,
+    @InjectRepository(UserSession) private readonly userSessionRepo: Repository<UserSession>,
+    @Inject(forwardRef(() => UserService)) private userService: UserService,
+
     private readonly configService: ConfigService,
-    @InjectRepository(User)
-    private readonly userRepo: Repository<User>,
-    @InjectRepository(UserSession)
-    private userSessionRepo: Repository<UserSession>,
     private readonly jwtService: JwtService,
     private readonly cacheManager: CachingService,
-    @Inject(forwardRef(() => UserService))
-    private userService: UserService,
   ) {
     const { clientId, clientSecret } = this.configService.get('ggAuth');
     this.oAuth2Client = new GoogleOAuth2Client(clientId, clientSecret);
   }
 
+  private async checkLoginNewDevice(userObj: User, headerObj: { uuid: string, userAgent: string }, token: string) {
+    const newDeviceLoggedIn = await this.userSessionRepo.findOne({
+      where: { user_id: userObj.id, uuid: headerObj.uuid },
+      withDeleted: true,
+    });
 
+    // if user not login this device with this uuid before
+    if (!newDeviceLoggedIn) {
+      const newUserSession = new UserSession();
+      newUserSession.user_id = userObj.id;
+      newUserSession.email_or_phone = userObj.email || userObj.phone_number;
+      newUserSession.uuid = headerObj.uuid;
+      newUserSession.user_agent = headerObj.userAgent;
+      newUserSession.session_type = AuthType.UsernamePasswordAuth
+        newUserSession.token = token;
+      await this.userSessionRepo.save(newUserSession);
+      console.log(`>>> The first time login >>> user: ${newUserSession.email_or_phone} - uuid: ${headerObj.uuid}}`);
+    } // if login this device with user_id and uuid before
+    else {
+      newDeviceLoggedIn.deletedAt = null;
+      this.userSessionRepo.save(newDeviceLoggedIn);
+    }
+  }
 
   async signUpStep1(signUpData) {
     let emailOrPhone = checkEmailOrPhone(signUpData.email_or_phone)
@@ -61,31 +82,35 @@ export class AuthService {
       return new BadRequestException(`${emailOrPhone} ${signUpData.email_or_phone} already existed`)
     }
 
-    if (emailOrPhone == 'phone_number') {
-      try {
-        await this.cacheManager.setter(
-          `SsAccVerifying_${signUpData.email_or_phone}`,
-          `${JSON.stringify({ ...signUpData, otpSecret: otpService.generateSecret() })}`,
-          OTP_SECOND_REFRESH * 10
-        )
-        let emailOrPhone = checkEmailOrPhone(signUpData.email_or_phone);
-        const newOtp = await this.otpGenerator(signUpData.email_or_phone, OtpType.VerifyEmailOrPhone, emailOrPhone)
-        smsSender(signUpData.email_or_phone, `FB-${newOtp} is your ${emailOrPhone} verification code`)
+    try {
+      await this.cacheManager.setter(
+        `SsAccVerifying_${signUpData.email_or_phone}`,
+        `${JSON.stringify({ ...signUpData, otpSecret: otpService.generateSecret() })}`,
+        OTP_SECOND_REFRESH * 7.5
+      )
+      const newOtp = await this.otpGenerator(signUpData.email_or_phone, OtpType.VerifyEmailOrPhone, emailOrPhone)
+      let otpMsg = `FB-${newOtp} is your ${emailOrPhone} verification code`
+      if(emailOrPhone === 'phone_number'){
+        await smsSender(signUpData.email_or_phone, otpMsg)
         return { code: 201, message: `OTP code has been send to number ${signUpData.email_or_phone}` }
-
-      } catch (err) {
-        return new BadRequestException(`Cannot send SMS to number ${signUpData.email_or_phone}`)
       }
+      else {
+        await mailSender(signUpData.email_or_phone, 'Verify your FB registration email', otpMsg)
+        return { code: 201, message: `OTP code has been send to  ${signUpData.email_or_phone}` }
+      }
+
+    } catch (err) {
+      return new BadRequestException(`Cannot send SMS to number ${signUpData.email_or_phone}`)
     }
   }
 
   async verifyOtpSubmission(otpCode: string, emailOrPhoneNumber: string, otpType: OtpType) {
-    console.log('odkaosdkkooasdkao')
     const checkOtpResult = { isValid: true, message: 'OTP is verified successfully' }
     let emailOrPhone = checkEmailOrPhone(emailOrPhoneNumber)
     var secret: string;
 
-    let userRec = await User.createQueryBuilder('user').where(`${emailOrPhone} = ${emailOrPhoneNumber}`).execute()
+    let userRec = await User.createQueryBuilder('user').where(`${emailOrPhone} = :emp`,{emp: emailOrPhoneNumber}).execute()
+    console.log('>>>>>>userRec', userRec)
     if (userRec.length == 0 && otpType == OtpType.VerifyEmailOrPhone) {
       let thisHodingCache = await this.cacheManager.getter(`SsAccVerifying_${emailOrPhoneNumber}`)
       if (!thisHodingCache) {
@@ -103,8 +128,8 @@ export class AuthService {
       this.cacheManager.getter(`SsAccVerifying_${emailOrPhoneNumber}`),
       this.cacheManager.getter(`SsForgotPassword_${emailOrPhoneNumber}`)
     ])
-    if (foundOtpSessionHolding.every(item => item == null))
-      return new BadRequestException(`OTP session expired`)
+    // if (foundOtpSessionHolding.every(item => item == null))
+    //   return new BadRequestException(`OTP session expired`)
 
     if (isValidOtp) {
       if (otpType == OtpType.VerifyEmailOrPhone) {
@@ -152,7 +177,50 @@ export class AuthService {
     return { code: checkOtpResult.isValid ? 200 : 401, ...checkOtpResult };
   }
 
-  async loginGoogle(ggToken: string, uuid: string) {
+  async getNewOtp(otpType: OtpType, emailOrPhoneNumber: string): Promise<any> {
+    let emp = checkEmailOrPhone(emailOrPhoneNumber)
+    const newOtp = await this.otpGenerator(emailOrPhoneNumber, otpType, emp)
+    let otpMsg = `FB-${newOtp} is your ${otpType} verification code`
+    try {
+      if(emp === 'phone_number'){
+        await smsSender(emailOrPhoneNumber, otpMsg)
+        return { code: 201, message: `OTP code has been send to number ${emailOrPhoneNumber}` }
+      }
+      else {
+        await mailSender(emailOrPhoneNumber, `OTP code ${otpType}`, otpMsg)
+        return { code: 201, message: `OTP code has been send to  ${emailOrPhoneNumber}` }
+      }
+    } catch (error) {
+      return new InternalServerErrorException(error)
+    }
+  }
+
+  async loginUsrPsw(emailOrPhoneNumber: string, password: string, uuid: string, userAgent: string) {
+    let emp = checkEmailOrPhone(emailOrPhoneNumber)
+    let whereObj = {}
+    whereObj[emp] = emailOrPhoneNumber;
+    const foundUser = await this.userRepo.findOne({ where: whereObj })
+    if (!foundUser)
+      return new BadRequestException(`${emp} ${emailOrPhoneNumber} not found`);
+    
+    const checkPass = await bcrypt.compare(password, foundUser.password) 
+    if(checkPass === false)
+      return new BadRequestException('Wrong password')
+
+    const payload = await this.getJwtPayload(foundUser, uuid);
+
+    const tokens = await this.getToken(payload);
+    await this.checkLoginNewDevice(foundUser, { uuid, userAgent }, tokens.refreshToken)
+    return {
+      code: 201,
+      data: {
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+      }
+    };
+  }
+
+  async loginGoogle(ggToken: string, uuid: string, userAgent: string) {
     const { clientId, authorizedDomain } = this.configService.get('ggAuth');
 
     let ggLoginTicket: LoginTicket;
@@ -183,7 +251,7 @@ export class AuthService {
       );
       throw new UnauthorizedException();
     }
-    let foundExistingUser;
+    let foundExistingUser: User;
     foundExistingUser = await this.userRepo.findOne({
       where: { email: email },
     });
@@ -213,6 +281,7 @@ export class AuthService {
         where: { id: getNewUser.id },
         relations: ['Profile'],
       });
+
       this.logger.log(`Create a new User with id = ${userInfo.id}`);
     } else {
       this.logger.log(
@@ -220,31 +289,19 @@ export class AuthService {
       );
     }
 
-    const checkUserLoginNewDevice = await this.userSessionRepo.findOne({
-      where: { user_id: foundExistingUser.id, uuid: uuid },
-      withDeleted: true,
-    });
-
-    // if user not login this device with this uuid before
-    if (!checkUserLoginNewDevice) {
-      const newLoginUserNewDevice = new UserSession();
-      newLoginUserNewDevice.user_id = foundExistingUser.id;
-      newLoginUserNewDevice.uuid = uuid;
-
-      await this.userSessionRepo.save(newLoginUserNewDevice);
-    } // if login this device with user_id and uuid before
-    else {
-      checkUserLoginNewDevice.deletedAt = null;
-      this.userSessionRepo.save(checkUserLoginNewDevice);
-    }
 
     const payload = await this.getJwtPayload(foundExistingUser, uuid);
 
     const tokens = await this.getToken(payload);
 
+    await this.checkLoginNewDevice(foundExistingUser, { uuid, userAgent }, tokens.refreshToken)
+
     return {
-      accessToken: tokens.accessToken,
-      refreshToken: tokens.refreshToken,
+      code: 201,
+      data: {
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+      }
     };
   }
 
@@ -317,9 +374,9 @@ export class AuthService {
     return user;
   }
 
-  private async otpGenerator(emailOrPhoneNumber: string, otpType: OtpType, emailOrPhone: string) {
+  private async otpGenerator(emailOrPhoneNumber: string, otpType: OtpType, emp: string) {
     let whereObj = {}
-    if (emailOrPhone === 'email')
+    if (emp === 'email')
       whereObj['email'] = emailOrPhoneNumber;
     else
       whereObj['phone_number'] = emailOrPhoneNumber
@@ -337,14 +394,10 @@ export class AuthService {
     return otpByServer
   }
 
-  // private async otpCheck(otpCode: string, secret: string): Promise<boolean> {
-  //   return authenticator.check(otpCode, secret)
-  // }
-
   async sendOtpVerification(emailOrPhoneNumber: string, otpType: OtpType) {
     let emailOrPhone = checkEmailOrPhone(emailOrPhoneNumber)
     if (otpType == OtpType.ForgotPassword) {
-      if(emailOrPhone === 'email') {
+      if (emailOrPhone === 'email') {
         let thisUserSecret: string = (await this.userRepo.findOne({ email: emailOrPhoneNumber })).secret
 
         let resetPswToken: string = this.jwtService.sign(
@@ -352,11 +405,11 @@ export class AuthService {
           { secret: process.env.JWT_RESET_PSW_TOKEN_SECRET, expiresIn: process.env.TTL_RESET_PSW || '5m' }
         )
         console.log(resetPswToken)
-        let resetPswLink = `${SERVER_DOMAIN}:${process.env.SERVER_PORT}/users/reset-password?link=${resetPswToken}`
+        let resetPswLink = `${SERVER_DOMAIN}:${process.env.SERVER_PORT}/users/forgot-password/form-fillout?link=${resetPswToken}`
         await mailSender(emailOrPhoneNumber, 'Reset Password Link', `Click the link below to reset your new password: ${resetPswLink}`)
         return { statusCode: 200, message: `A Reset Password Link has been sent to email ${emailOrPhoneNumber}` }
       }
-      else if(emailOrPhone === 'phone') {
+      else if (emailOrPhone === 'phone') {
         const otpCode = await this.otpGenerator(emailOrPhoneNumber, otpType, emailOrPhone);
         let msg = `FB-${otpCode} is your code reset password`
         smsSender(emailOrPhoneNumber, msg)

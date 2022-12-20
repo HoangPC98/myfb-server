@@ -8,16 +8,23 @@ import { searchByUserNameUnicode } from 'src/utils/search-engine.util';
 import { UsersRepository } from './user.repository';
 import { updateEntityByField_Value } from 'src/repository/common.repository'
 import { JwtService } from '@nestjs/jwt';
+import bcrypt from 'bcrypt';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepo: UsersRepository) { }
-  private readonly jwtService: JwtService;
+  constructor(
+    private readonly userRepositoty: UsersRepository,
+    @InjectRepository(User) private readonly userRepo: Repository<User>,
+    private readonly jwtService: JwtService
+  ) {}
+ 
   private readonly PREVIEW_FRIEND_ITEM_NUM = 6;
   private readonly PREVIEW_PHOTO_ITEM_NUM = 9;
 
   async searchByUsername(inputString: string) {
-    const allUser = await this.userRepo.getAllUser();
+    const allUser = await this.userRepositoty.getAllUser();
     const filterUser = searchByUserNameUnicode(inputString, allUser);
     console.log('filer uccccser', filterUser);
     return {
@@ -48,7 +55,7 @@ export class UserService {
 
     const isMine = user_id === uid ? true : false;
 
-    const userInfo = await this.userRepo.getUserByRepo({ id: user_id }, [
+    const userInfo = await this.userRepositoty.getUserByRepo({ id: user_id }, [
       'Profile',
       'Privacy',
     ]);
@@ -56,7 +63,7 @@ export class UserService {
     console.log('USERINFO', userInfo);
 
     const { listFriend, countAllFriend } =
-      await this.userRepo.getListFriendByUserId(user_id, isMine);
+      await this.userRepositoty.getListFriendByUserId(user_id, isMine);
     const listFriendMaping = listFriend.map((item) => {
       let thisFriend: User;
       if (user_id === item.sender_uid) thisFriend = item.Receiver;
@@ -71,7 +78,7 @@ export class UserService {
 
     console.log('listFrined', listFriend);
 
-    const listPhoto = await this.userRepo.getListPhotosByUserId(user_id);
+    const listPhoto = await this.userRepositoty.getListPhotosByUserId(user_id);
     const listPhotoMaping = listPhoto.map((item) => {
       return {
         photo_id: item.id,
@@ -79,7 +86,7 @@ export class UserService {
       };
     });
 
-    const listPost = await this.userRepo.getListPostByUserId(
+    const listPost = await this.userRepositoty.getListPostByUserId(
       user_id,
       isMine,
     );
@@ -122,17 +129,28 @@ export class UserService {
 
   async changeUserStatus(queryObj: object, status: UserStatus) {
     try {
-      return await updateEntityByField_Value(EntityType.User, queryObj, {status: status})
+      return await updateEntityByField_Value(EntityType.User, queryObj, { status: status })
     } catch (error) {
       throw new BadRequestException('Error updating user status')
     }
   }
 
-  async changePasswordViaLinkEmail(linkEmail: string){
+  async changePasswordViaLinkEmail(newPassword: string, token: string) {
     try {
-      const verifyLink = await this.jwtService
+      const checkToken = await this.jwtService.verify(token, { secret: process.env.JWT_RESET_PSW_TOKEN_SECRET });
+      console.log('>>>changePasswordViaLinkEmail', checkToken, newPassword)
+      if (checkToken) {
+        const newHashPwd = await bcrypt.hash(newPassword, +process.env.HASH_PSW_SALTROUND || 10);
+        const reulstChangePsw = await this.userRepo.createQueryBuilder()
+          .update(User)
+          .set({ password: newHashPwd })
+          .where({ email: checkToken.email })
+          .execute();
+        return {code: 201, result: reulstChangePsw};
+      }
+
     } catch (error) {
-      
+      throw new Error(error.message)
     }
   }
 

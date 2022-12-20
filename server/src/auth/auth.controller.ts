@@ -1,8 +1,9 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Headers, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { GetCurrentUser } from './decorators/getRequest.decorator';
 import { Public } from './decorators/public-auth.decorator';
-import { LoginGoogleDto } from './dto/login-gg.dto';
+import { OtpGetNewDto } from './dto/ otp.dto';
+import { LoginGoogleDto, LoginUsrPswDto } from './dto/login.dto';
 import { SignUpDto } from './dto/sign-up.dto';
 
 @Controller('auth')
@@ -10,12 +11,14 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Public()
-  @Post('google-login')
-  async loginGoogle(@Body() loginGoogleBody: LoginGoogleDto): Promise<any> {
-    console.log('login ggoogle>>>>');
+  @Post('login/google')
+  async loginGoogle(@Body() loginGoogleBody: LoginGoogleDto, @Headers() headers): Promise<any> {
+    console.log('login header>>>>', headers);
+
     const data = await this.authService.loginGoogle(
       loginGoogleBody.ggToken,
-      loginGoogleBody.uuid,
+      headers.uuid,
+      headers['user-agent']
     );
     return {
       response: data,
@@ -27,11 +30,23 @@ export class AuthController {
   }
 
   @Public()
+  @Post('login')
+  async loginUsrPsw(@Body() usrpswBody: LoginUsrPswDto, @Headers() headers){
+    return await this.authService.loginUsrPsw(usrpswBody.email_or_phone, usrpswBody.password, headers.uuid, headers['user-agent']);
+  }
+
+  @Public()
   @Post('signup/fillout-data')
   async signUp(@Body() signUpData: SignUpDto): Promise<any> {
     const result = await this.authService.signUpStep1(signUpData)
     return result
   }
+
+  @Public()
+  @Post('otp/get-new/na')
+  async getNewOtp(@Body() otpGetNewBody: OtpGetNewDto): Promise<any> {
+    return await this.authService.getNewOtp(otpGetNewBody.otp_type, otpGetNewBody.email_or_phone)
+  } 
 
   @Public()
   @Post('otp/verify-submission')

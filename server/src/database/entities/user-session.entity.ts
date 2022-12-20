@@ -1,4 +1,4 @@
-import { OtpType } from 'src/types/enum-types/common.enum';
+import { AuthType, OtpType } from 'src/types/enum-types/common.enum';
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 import CustomBaseEntity from './base-entity';
 import { User } from './user.entity';
@@ -20,11 +20,11 @@ export class UserSession extends CustomBaseEntity {
 
   @Column({
     type: 'enum',
-    enum: OtpType,
+    enum: AuthType || OtpType,
     nullable: false,
-    default: OtpType.VerifyEmailOrPhone
+    default: AuthType.UsernamePasswordAuth
   })
-  session_type: string;
+  session_type: AuthType | OtpType;
 
   @Column({nullable: true})
   flag: number;

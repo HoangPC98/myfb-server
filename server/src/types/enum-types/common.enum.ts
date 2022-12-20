@@ -59,6 +59,7 @@ export enum AuthType {
   GoogleAuth = 'google_auth',
   UsernamePasswordAuth = 'username_password_auth',
   OtpAuth = 'otp_auth',
+  Login = 'login',
 }
 
 export enum UserStatus {

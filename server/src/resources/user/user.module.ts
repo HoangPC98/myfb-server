@@ -10,10 +10,23 @@ import { Post } from 'src/database/entities/post.entity';
 import { Profile } from 'src/database/entities/profile.entity';
 import { Privacy } from 'src/database/entities/privacy.entity';
 import { AuthModule } from 'src/auth/auth.module';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Profile, Privacy, Post, FriendShip, Photo]),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get('jwtAuth').jwt_token_secret,
+        signOptions: {
+          expiresIn: configService.get('jwtAuth').access_token_ttl,
+        },
+      }),
+    }),
     forwardRef(() => AuthModule)
   ],
   controllers: [UserController],
