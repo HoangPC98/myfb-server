@@ -146,7 +146,7 @@ export class UserService {
           .set({ password: newHashPwd })
           .where({ email: checkToken.email })
           .execute();
-        return {code: 201, result: reulstChangePsw};
+        // return {code: 201, result: reulstChangePsw};
       }
 
     } catch (error) {

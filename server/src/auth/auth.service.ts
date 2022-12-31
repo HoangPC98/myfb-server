@@ -394,8 +394,9 @@ export class AuthService {
     return otpByServer
   }
 
-  async sendOtpVerification(emailOrPhoneNumber: string, otpType: OtpType) {
+  async sendOtpOrLinkVerification(emailOrPhoneNumber: string, otpType: OtpType) {
     let emailOrPhone = checkEmailOrPhone(emailOrPhoneNumber)
+    console.log(`>>> OTP Verification`, emailOrPhone)
     if (otpType == OtpType.ForgotPassword) {
       if (emailOrPhone === 'email') {
         let thisUserSecret: string = (await this.userRepo.findOne({ email: emailOrPhoneNumber })).secret
@@ -409,10 +410,10 @@ export class AuthService {
         await mailSender(emailOrPhoneNumber, 'Reset Password Link', `Click the link below to reset your new password: ${resetPswLink}`)
         return { statusCode: 200, message: `A Reset Password Link has been sent to email ${emailOrPhoneNumber}` }
       }
-      else if (emailOrPhone === 'phone') {
+      else if (emailOrPhone === 'phone_number') {
         const otpCode = await this.otpGenerator(emailOrPhoneNumber, otpType, emailOrPhone);
         let msg = `FB-${otpCode} is your code reset password`
-        smsSender(emailOrPhoneNumber, msg)
+        await smsSender(emailOrPhoneNumber, msg)
         return { statusCode: 200, message: `An OTP Code Reset Password has been sent to number ${emailOrPhoneNumber}` }
       }
     }

@@ -34,7 +34,7 @@ export class CommentService {
       newComment.entity_id = addCommentDto.entity_id;
       newComment.text = addCommentDto.text;
 
-      thisEntity['count_comment'] += 1;
+      thisEntity['count_comment'] += 1; 
 
       await getManager().transaction(async (transactionManager) => {
         await transactionManager.save(newComment);

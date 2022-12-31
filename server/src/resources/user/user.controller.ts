@@ -28,7 +28,7 @@ export class UserController {
   constructor(
     private readonly userService: UserService,
     @Inject(forwardRef(() => AuthService))
-    private authService: AuthService
+    private readonly authService: AuthService
   ) {}
 
   @Get('search')
@@ -82,9 +82,9 @@ export class UserController {
   }
 
   @Public()
-  @Post('forgot-password/get-otp')
-  async getOtpForgotPassword(@Body() emailOrPhoneBody: {email_or_phone: string}) {
-    return this.authService.sendOtpVerification(emailOrPhoneBody.email_or_phone, OtpType.ForgotPassword )
+  @Post('forgot-password/get-verification')
+  async getForgotPasswordVerification(@Body() emailOrPhoneBody: {email_or_phone: string}) {
+    return this.authService.sendOtpOrLinkVerification(emailOrPhoneBody.email_or_phone, OtpType.ForgotPassword )
   }
 
   @Public()
