@@ -31,6 +31,7 @@ export class AuthController {
 
   @Get('logout')
   async logOut(@GetCurrentUser() user) {
+    console.log(`LOGOGOGO UT`);
     return await this.authService.logOut(user);
   }
 }

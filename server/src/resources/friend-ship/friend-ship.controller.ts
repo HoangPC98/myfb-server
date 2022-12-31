@@ -13,7 +13,10 @@ export class FriendShipController {
     @GetCurrentUID() sender_uid: number,
     @Body() addFriendDto: AddFriendDto,
   ) {
-    return await this.friendShipService.addFriendRequest(addFriendDto);
+    return await this.friendShipService.addFriendRequest(
+      +sender_uid,
+      addFriendDto.receiver_uid,
+    );
   }
 
   @Patch('request-reply')

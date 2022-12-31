@@ -93,7 +93,7 @@ export class UsersRepository {
     return listPost;
   }
 
-  async getListFriendByUserId(user_id: number, isMine?: boolean) {
+  async getListFriendByUserId(user_id: number, isMine?: boolean): Promise<any> {
     const whereQuery = `(sender_uid = ${user_id} OR receiver_uid = ${user_id}) AND  friendship_status = '${FriendShipStatus.BeFriended}'`;
     const listFriend: FriendShip[] = await getEntityPagination(
       { use: QueryOption.UseRepository, repository: this.friendshipRepo },

@@ -29,7 +29,10 @@ for (let i = 0; i < moreBtn.length; i++) {
     }
 }
 
-
+document.querySelector('.setting__item nav-logout').onclick = function() {
+    console.log('OK LOGOUT')
+        // await getRequest('auth/logout')
+}
 
 //number to short number
 const compactNumber = (value) => {
@@ -313,15 +316,16 @@ const app = (() => {
                                     </div>
                                 </div>
                                 <div class="commented-box active">
-                                    ${cmts.map((cmt) => {
-                        const userCmt = users.find((user) => {
-                            return cmt.idUser === user.id
-                        })
-                        const cmtSubs = comments.filter(comment => {
-                            return comment.parentIdCmt === cmt.id && comment.sub && !comment.deleted
-                        })
-
-                        return ` <
+                                    ${
+                                        cmts.map((cmt) => {
+                                            const userCmt = users.find((user) => {
+                                                return cmt.idUser === user.id
+                                            })
+                                            const cmtSubs = comments.filter(comment => {
+                                                return comment.parentIdCmt === cmt.id && comment.sub && !comment.deleted
+                                            })
+    
+                                            return ` <
                         div class = "commented-box__item" >
                         <
                         div class = "commented-box__item-user" >
@@ -378,7 +382,7 @@ const app = (() => {
                                 })
 
                                 return `
-                            < div class="commented-box__item-user sub" >
+                                                            <div class="commented-box__item-user sub">
                                                                 <div class="commented-box__item-avatar">
                                                                     <img src="${user.avatar}" alt="">
                                                                 </div>
@@ -406,8 +410,8 @@ const app = (() => {
                                                                 <div style="display: ${this.idUser == cmt2.idUser ? 'block' : 'none'}" data-index="${cmt2.id}" class="commented-box__item-delete">
                                                                     <i class="fad fa-trash-alt"></i>
                                                                 </div>
-                                                            </div >
-    `
+                                                            </div>
+                                                            `
 
                             }).join('')
                         } <
@@ -419,21 +423,21 @@ const app = (() => {
                                         }).join('')
                                     }
     
-                                </div >
-                            </div >
-    html3
-                        </div >
-                    </div >
-    `
+                                </div>
+                            </div>
+                            html3
+                        </div>
+                    </div>
+                    `
                 }
             })
             const component = $('.my-wall').style.display === 'block' ? newfWall : newfContainer
             if (htmls) {} else {
                 htmls = `
-    < div class="newfeed-list--no-tus" >
-        Hiện chưa có bài viết nào.
-                    </div >
-    `
+                    <div class="newfeed-list--no-tus">
+                        Hiện chưa có bài viết nào.
+                    </div>
+                `
             }
             component.innerHTML = htmls
             this.showInfoUser()
@@ -491,7 +495,7 @@ const app = (() => {
                 if (mess.idUser != this.idUser && mess.endMess) {
                     const user = users.find(user => user.id === mess.idUser)
                     return `
-    < li class="mess-item" >
+                    <li class="mess-item">
                         <div class="mess-item__active">
                             <img src="${user.avatar}" alt="" class="mess-item__avatar">
                         </div>
@@ -509,8 +513,8 @@ const app = (() => {
                                 </span> 
                             </div>
                         </div>
-                    </li >
-    `
+                    </li>
+                    `
                 }
             }).join('')
             $('.mess-list').innerHTML = htmls

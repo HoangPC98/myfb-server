@@ -9,8 +9,11 @@ import { Photo, PhotoType } from 'src/database/entities/photo.entity';
 import { Post } from 'src/database/entities/post.entity';
 import { PrivacyMode } from 'src/database/entities/privacy.entity';
 import { Reaction } from 'src/database/entities/reaction.entity';
-import { getManager, Repository } from 'typeorm';
+import { TypeDateTime } from 'src/types/enum-types/common.enum';
+import { transformDateTime } from 'src/utils/transformer.util';
+import { getManager, In, Repository } from 'typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
+import { GetPostQueryPaginate } from './dto/get-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PostsRepository } from './post.repository';
 
@@ -77,5 +80,35 @@ export class PostService {
       throw new InternalServerErrorException(this.errCreatePostMsg);
     }
     return 1;
+  }
+
+  async getNewsfeed(uid: number, getPostQuery: GetPostQueryPaginate) {
+    const postRecs: Post[] = await this.postRepository.getPostForNewsfeed(
+      uid,
+      getPostQuery,
+    );
+    const result = postRecs.map((item) => {
+      const self_reaction = item.Reactions.map(
+        (item) => item.owner_id,
+      ).includes(uid)
+        ? item.Reactions.find((item) => item.owner_id == uid).reaction_type
+        : 'nope';
+      return {
+        post_id: item.id,
+        owner_id: item.owner_id,
+        owner_name: item.Owner.given_name,
+        owner_avatar: item.Owner.avatar_url,
+        text: item.text,
+        list_photo: item.Photos.map((photo) => photo.photo_url),
+        count_reaction: item.count_reaction,
+        count_comment: item.count_comment,
+        seft_reaction: self_reaction,
+        created_at: transformDateTime(item.createdAt, TypeDateTime.Relative),
+      };
+    });
+    console.log('result..', result);
+    return {
+      response: result,
+    };
   }
 }

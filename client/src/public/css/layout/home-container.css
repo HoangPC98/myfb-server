@@ -249,7 +249,7 @@
 
 .container-posts,
 .container-mess-room {
-    width: 600px;
+    width: var(--main-list-width);
     margin: 0 auto;
     margin: 24px 0 16px 0;
     background-color: var(--white-color);

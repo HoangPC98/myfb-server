@@ -4,7 +4,11 @@ import {
   FriendShip,
   FriendShipStatus,
 } from 'src/database/entities/friend-ship.entity';
-import { EntityType, NotifyType, ReplyAddFrRequest } from 'src/types/enum-types/common.enum';
+import {
+  EntityType,
+  NotifyType,
+  ReplyAddFrRequest,
+} from 'src/types/enum-types/common.enum';
 import { Repository } from 'typeorm';
 import { NotificationService } from '../notification/notification.service';
 import { FriendShipRepositoty } from './friend-ship.repository';
@@ -19,18 +23,20 @@ export class FriendShipService {
   ) {}
   private readonly notFoundAddFrErrMsg = 'Not Found Add Friend Request';
 
-  async addFriendRequest(addFriendDto) {
+  async addFriendRequest(uid: number, receiver_uid: number) {
     const checkExistFriendShip =
       await this.friendshipRepository.getOneFriendship({
-        sender_uid: addFriendDto.sender_uid,
-        receiver_uid: addFriendDto.receiver_uid,
+        sender_uid: uid,
+        receiver_uid: receiver_uid,
       });
     if (checkExistFriendShip) {
       throw new BadRequestException(`Friend Request have been existed`);
     }
 
-    let newAddFriendRequest = new FriendShip();
-    newAddFriendRequest = { ...addFriendDto, status: FriendShipStatus.Pending };
+    const newAddFriendRequest = new FriendShip();
+    newAddFriendRequest.sender_uid = uid;
+    newAddFriendRequest.receiver_uid = receiver_uid;
+    newAddFriendRequest.friendship_status = FriendShipStatus.Pending;
     try {
       console.log(newAddFriendRequest);
       const createdFriendShip = await this.friendShipRepo.save(
@@ -40,8 +46,8 @@ export class FriendShipService {
       // push notification
 
       await this.notificationService.sendNotificationFromOneToOne(
-        addFriendDto.sender_uid,
-        addFriendDto.receiver_uid,
+        uid,
+        receiver_uid,
         createdFriendShip.id,
         NotifyType.AddFriendRequest,
         EntityType.FriendShip,

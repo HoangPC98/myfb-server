@@ -11,6 +11,7 @@ import {
   UseInterceptors,
   UploadedFile,
   Req,
+  Query,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -22,6 +23,7 @@ import { diskStorage } from 'multer';
 import { GetCurrentUID } from 'src/auth/decorators/getUid.derator';
 import { FileType } from 'src/types/enum-types/common.enum';
 import { PhotoType } from 'src/database/entities/photo.entity';
+import { GetPostQueryPaginate } from './dto/get-post.dto';
 
 const loadConfigMulterOption = (type: any, filename?: string) => {
   return {
@@ -72,5 +74,13 @@ export class PostController {
       createPostDto,
       imgFile ? imgFile : false,
     );
+  }
+
+  @Get('newsfeed')
+  async getNewsFeed(
+    @GetCurrentUID() uid: number,
+    @Query() getPostQuery: GetPostQueryPaginate,
+  ) {
+    return await this.postService.getNewsfeed(+uid, getPostQuery);
   }
 }

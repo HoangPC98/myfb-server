@@ -30,8 +30,5 @@ export class ReactionController {
       entity_id,
       reactor_id,
     );
-    return {
-      response: 'ok',
-    };
   }
 }

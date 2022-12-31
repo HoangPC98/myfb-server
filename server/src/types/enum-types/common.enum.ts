@@ -54,3 +54,10 @@ export enum QueryOption {
   UseRepository = ' repository',
   UseQueryBuilder = 'queryBuilder',
 }
+
+export enum TypeDateTime {
+  Relative = 'get_one',
+  DmyHms24 = 'DD-MM-YYYY HH:mm:ss',
+  DmyHms12 = 'DD-MM-YYYY HH:mm:ss APM',
+  Dmy = 'DD-MM-YYYY',
+}

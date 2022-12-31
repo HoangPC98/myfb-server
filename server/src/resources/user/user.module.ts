@@ -16,5 +16,6 @@ import { Privacy } from 'src/database/entities/privacy.entity';
   ],
   controllers: [UserController],
   providers: [UserService, UsersRepository],
+  exports: [UsersRepository],
 })
 export class UserModule {}

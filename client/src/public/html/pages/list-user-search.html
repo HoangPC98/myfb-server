@@ -8,11 +8,21 @@
 <link rel="stylesheet" href="/css/components/switchmode.css">
 <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v6.0.0-beta1/css/all.css" />
 
-<div class="center-box-w600">
-    <div class="header-a">
-        <h3 class="post-box__head-text">Mọi người</h3>
+<body>
+    <div class="header"></div>
+    <div class="container-main-o center-box-w600">
+        <div class="header-a">
+            <h3 class="post-box__head-text">Mọi người</h3>
+        </div>
+        <div class="body-list-user item-below-header-a"></div>
     </div>
-    <div class="body-list-user item-below-header-a"></div>
-</div>
+
+</body>
+<script>
+    $(function() {
+        $(".header").load("/html/components/header.html");
+    });
+</script>
+
 
 <script type="module" src="/js/list-user-search.script.js"></script>

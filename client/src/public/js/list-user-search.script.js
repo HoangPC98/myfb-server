@@ -24,6 +24,7 @@ const redirectRequest = async() => {
 
 const loadListUser = (response) => {
     const renderLoad = renderListUser(response.data)
+    console.log('render relaod', renderLoad)
     $('.body-list-user').html(renderLoad)
 }
 
@@ -49,7 +50,6 @@ $('.body-list-user').on('click', async function(e) {
         let parent = e.target.parentElement.parentElement
         this_user_id = parent.id
         this_user_id = this_user_id.split(':')[1]
-
         await getRequest(`users/profile`, {
             user_id: this_user_id
         })

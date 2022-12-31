@@ -67,7 +67,7 @@ const upload = async(payload) => {
     }
 
     console.log('fom datatata', data)
-    const resonse = await postRequest('posts/new', data, isIncludeFile)
+    const resonse = await postRequest('posts/new-post', data, isIncludeFile)
     if (resonse.status === 201) alert('Upload successfully')
     else alert('Failed to upload')
     window.location.reload()

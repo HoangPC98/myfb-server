@@ -1,4 +1,9 @@
 import { redirectRequest } from '/js/common.js';
+import {
+    postRequest,
+    getRequest,
+    getCookieByName
+} from '/js/fetch-api.js';
 
 
 $('#search-input').on('keydown', async function(e) {

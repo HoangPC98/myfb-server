@@ -24,3 +24,21 @@ export const decodeAccessToken = () => {
 export const redirectRequest = (requestObj) => {
     localStorage.setItem('redirect_request', JSON.stringify(requestObj))
 }
+
+export const getItemId = (target, classItem) => {
+    const parent = getParentOrigin(target, classItem);
+    const itemId = parent.id.split('_')[1];
+}
+
+export const getParentOrigin = (child, classItemParent) => {
+    let parent = child;
+    let loop = 0
+    while (!parent.classList.contains(classItemParent) && loop < 10) {
+        parent = parent.parentElement
+        loop++
+    }
+    // if (!parent.classList.contains(classItemParent))
+    //     parent = null;
+    console.log('parent...', parent)
+    return parent
+}
