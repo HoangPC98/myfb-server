@@ -33,22 +33,23 @@
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    uuid: '1237474382'
+
                 },
                 body: JSON.stringify({
                     ggToken: gg_token,
-                    uuid: '1237474382'
                 }),
             };
-            fetch(`${serverURL}/auth/google-login`, option)
+            fetch(`${serverURL}/auth/login/google`, option)
                 .then((response) => {
                     return response.json();
                 })
                 .then((result) => {
                     console.log('data...', result);
                     console.log('accessToken...', result.data.accessToken)
-                    document.cookie = `access_token=${result['accessToken']}`
-                    document.cookie = `refresh_token=${result['accessToken']}`
-
+                    document.cookie = `access_token=${result.data['accessToken']}`
+                    document.cookie = `refresh_token=${result.data['accessToken']}`
+                    document.cookie = `user=${JSON.stringify(result.data.user)}`
                     window.location.href = '/home'
                 })
                 .catch((error) => {
