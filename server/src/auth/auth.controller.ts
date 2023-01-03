@@ -15,14 +15,12 @@ export class AuthController {
   async loginGoogle(@Body() loginGoogleBody: LoginGoogleDto, @Headers() headers): Promise<any> {
     console.log('login header>>>>', headers);
 
-    const data = await this.authService.loginGoogle(
+    return await this.authService.loginGoogle(
       loginGoogleBody.ggToken,
       headers.uuid,
       headers['user-agent']
     );
-    return {
-      response: data,
-    };
+    
   }
 
   async logOut(@GetCurrentUser() user) {

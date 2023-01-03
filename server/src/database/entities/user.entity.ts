@@ -64,10 +64,10 @@ export class User extends CustomBaseEntity {
   @Column({unique: true, nullable: true })
   phone_number: string;
 
-  @Column()
+  @Column({select: false, nullable: true, default: null})
   password: string;
 
-  @Column({unique: true })
+  @Column({unique: true, select: false })
   secret: string;
 
   @OneToOne(() => Profile, (profile) => profile.User) // specify inverse side as a second parameter
@@ -86,6 +86,9 @@ export class User extends CustomBaseEntity {
 
   @OneToMany(() => UserSession, (loginSession) => loginSession.User)
   UserSessions: UserSession[];
+
+  // @OneToMany(() => FriendShip, (friendship) => friendship.Sender || friendship.Receiver)
+  // FriendShips: FriendShip[];
 
   @OneToMany(
     () => NotificationReceive,

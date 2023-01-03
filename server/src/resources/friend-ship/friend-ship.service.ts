@@ -19,18 +19,20 @@ export class FriendShipService {
   ) {}
   private readonly notFoundAddFrErrMsg = 'Not Found Add Friend Request';
 
-  async addFriendRequest(addFriendDto) {
+  async addFriendRequest(sender_uid: number, receiver_uid: number) {
     const checkExistFriendShip =
       await this.friendshipRepository.getOneFriendship({
-        sender_uid: addFriendDto.sender_uid,
-        receiver_uid: addFriendDto.receiver_uid,
+        sender_uid: sender_uid,
+        receiver_uid: receiver_uid,
       });
     if (checkExistFriendShip) {
       throw new BadRequestException(`Friend Request have been existed`);
     }
 
     let newAddFriendRequest = new FriendShip();
-    newAddFriendRequest = { ...addFriendDto, status: FriendShipStatus.Pending };
+    newAddFriendRequest.receiver_uid = receiver_uid;
+    newAddFriendRequest.sender_uid = sender_uid;
+    newAddFriendRequest.friendship_status = FriendShipStatus.Pending;
     try {
       console.log(newAddFriendRequest);
       const createdFriendShip = await this.friendShipRepo.save(
@@ -40,8 +42,8 @@ export class FriendShipService {
       // push notification
 
       await this.notificationService.sendNotificationFromOneToOne(
-        addFriendDto.sender_uid,
-        addFriendDto.receiver_uid,
+        sender_uid,
+        receiver_uid,
         createdFriendShip.id,
         NotifyType.AddFriendRequest,
         EntityType.FriendShip,

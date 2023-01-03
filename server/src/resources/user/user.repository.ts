@@ -56,8 +56,8 @@ export class UsersRepository {
     else return userRecs;
   }
 
-  async getAllUser() {
-    return await this.userRepo.find();
+  async getAllUser(option) {
+    return await this.userRepo.find(option)
   }
 
 
@@ -82,7 +82,7 @@ export class UsersRepository {
   }
 
   async getListFriendByUserId(user_id: number, isMine?: boolean) {
-    const whereQuery = `(sender_uid = ${user_id} OR receiver_uid = ${user_id}) AND  friendship_status = '${FriendShipStatus.BeFriended}'`;
+    const whereQuery = `(sender_uid = ${user_id} OR receiver_uid = ${user_id}) AND  status = '${FriendShipStatus.BeFriended}'`;
     const listFriend: FriendShip[] = await getEntityPagination(
       { use: QueryOption.UseRepository, repository: this.friendshipRepo },
       EntityType.FriendShip,

@@ -3,7 +3,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { User } from 'src/database/entities/user.entity';
 import { EntityType, UserInfoType, UserStatus } from 'src/types/enum-types/common.enum';
 
-import { searchByUserNameUnicode } from 'src/utils/search-engine.util';
+import { searchResourceUnicode } from 'src/utils/search-engine.util';
 
 import { UsersRepository } from './user.repository';
 import { updateEntityByField_Value } from 'src/repository/common.repository'
@@ -11,6 +11,7 @@ import { JwtService } from '@nestjs/jwt';
 import bcrypt from 'bcrypt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { FriendShipStatus } from 'src/database/entities/friend-ship.entity';
 
 @Injectable()
 export class UserService {
@@ -23,13 +24,72 @@ export class UserService {
   private readonly PREVIEW_FRIEND_ITEM_NUM = 6;
   private readonly PREVIEW_PHOTO_ITEM_NUM = 9;
 
-  async searchByUsername(inputString: string) {
-    const allUser = await this.userRepositoty.getAllUser();
-    const filterUser = searchByUserNameUnicode(inputString, allUser);
-    console.log('filer uccccser', filterUser);
+  async searchByUsername(uid: number, keyword: string) {
+    const allUsers= await this.userRepo.query(`
+    SELECT users.id, users.given_name, users.avatar_url, friend_ships.receiver_uid, friend_ships.sender_uid, friend_ships.friendship_status
+    FROM users 
+    JOIN friend_ships
+    ON users.id IN (friend_ships.sender_uid, friend_ships.receiver_uid)
+    WHERE users.id <> ${uid}
+    ORDER BY users.id
+    `)
+    const reqUserFriends = await this.userRepo.query(`
+    SELECT users.id, friend_ships.receiver_uid, friend_ships.sender_uid, friend_ships.friendship_status
+    FROM users 
+    JOIN friend_ships
+    ON users.id IN (friend_ships.sender_uid, friend_ships.receiver_uid)
+    WHERE users.id = ${uid}
+    `)
+    console.log('Current IAID',reqUserFriends)
+    var reqUserFriendship = {
+      id: reqUserFriends[0].id,
+      friends: []
+    }
+    reqUserFriends.forEach(item=>{
+      if(item.friendship_status === FriendShipStatus.BeFriended)
+        reqUserFriendship.friends.push(
+          item.id === item.receiver_uid ? item.sender_uid : item.receiver_uid,
+        )
+    })
+    console.log('reqUserFriendship',reqUserFriendship)
+
+    let transfromResult = [];
+    var listUid : number[] = [];
+    var listUser = [];
+    allUsers.forEach(user => {
+      let thisFriendUid = user.id === user.sender_uid ? user.receiver_uid : user.sender_uid
+      if(!listUid.includes(user.id)){
+        if(user.friendship_status === FriendShipStatus.BeFriended){
+          listUser.push({
+            id: user.id,
+            given_name: user.given_name,
+            avatar_url: user.avatar_url,
+            friends: [thisFriendUid]
+          });
+          listUid.push(user.id)
+        }
+      }
+      else{
+       listUser[listUser.length-1].friends.push(thisFriendUid)
+      }
+    })
+    const filterUser = searchResourceUnicode(keyword, listUser, 'given_name');
+    console.log('LIST FILTER',filterUser);
+    let reulst = filterUser.map(user =>{
+      return {
+        ...user,
+        mutual_friend: user.friends.reduce((acc, friend)=>{
+          if(reqUserFriendship.friends.includes(friend))
+            acc.push(friend);
+            return acc;
+        }, [])
+      }
+    })
+    console.log('>>>>>>reulst',reulst)
     return {
-      response: filterUser,
-    };
+      code: 200,
+      data: filterUser,
+    }
   }
 
   async updateUser(type: UserInfoType, uid: number, payload: any) {

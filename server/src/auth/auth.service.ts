@@ -273,6 +273,7 @@ export class AuthService {
       newUser.avatar_url = picture;
       newUser.gender = Gender.Other;
       newUser.avatar_url = picture;
+      newUser.secret = otpService.generateSecret();
 
       console.log('user....', newUser);
       const getNewUser = await this.userRepo.save(newUser);
@@ -301,6 +302,7 @@ export class AuthService {
       data: {
         accessToken: tokens.accessToken,
         refreshToken: tokens.refreshToken,
+        user: payload
       }
     };
   }
