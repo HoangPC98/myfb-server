@@ -32,15 +32,14 @@ export class FriendShipService {
     let newAddFriendRequest = new FriendShip();
     newAddFriendRequest.receiver_uid = receiver_uid;
     newAddFriendRequest.sender_uid = sender_uid;
-    newAddFriendRequest.friendship_status = FriendShipStatus.Pending;
+    newAddFriendRequest.status = FriendShipStatus.Pending;
     try {
-      console.log(newAddFriendRequest);
+      console.log('ADD FRIEND...',newAddFriendRequest);
       const createdFriendShip = await this.friendShipRepo.save(
         newAddFriendRequest,
       );
 
       // push notification
-
       await this.notificationService.sendNotificationFromOneToOne(
         sender_uid,
         receiver_uid,
@@ -68,13 +67,13 @@ export class FriendShipService {
       },
       ['Sender', 'Receiver'],
     );
-    thisRequest.friendship_status =
+    thisRequest.status =
       option === ReplyAddFrRequest.Accept
         ? FriendShipStatus.BeFriended
-        : FriendShipStatus.RejectFriend;
+        : FriendShipStatus.UnFriend;
 
     if (option === ReplyAddFrRequest.Accept) {
-      thisRequest.friendship_status = FriendShipStatus.BeFriended;
+      thisRequest.status = FriendShipStatus.BeFriended;
       const sender_uid = thisRequest.receiver_uid;
       const receiver_uid = thisRequest.sender_uid;
 
@@ -88,14 +87,14 @@ export class FriendShipService {
         message,
       );
     } else {
-      thisRequest.friendship_status = FriendShipStatus.RejectFriend;
+      thisRequest.status = FriendShipStatus.UnFriend;
     }
     return await this.friendShipRepo.save(thisRequest);
 
     // push notification
   }
 
-  async cancelFriendRequest(request_id, sender_uid) {
+  async cancelFriendRequest(request_id: number, sender_uid: number) {
     try {
       return await this.friendShipRepo.softDelete({
         id: request_id,
@@ -107,4 +106,6 @@ export class FriendShipService {
       );
     }
   }
+
+ 
 }

@@ -40,16 +40,10 @@ export const getEntityPagination = async (
     : 0;
 
   if (queryOption.use === QueryOption.UseQueryBuilder) {
-    let stringWhere = where;
-    let paramWhere = {};
-    if (typeof where !== 'string') {
-      const { stringQuery, paramQuery } = transformWhereQuery(where, true);
-      stringWhere = stringQuery;
-      paramWhere = paramQuery;
-    }
+    let whereQuery : [p1: string, p2: object] = where;
     return await getManager()
       .createQueryBuilder(entity_type, entity_type)
-      .where(stringWhere, paramWhere)
+      .where(...whereQuery)
       .skip(skipQuery)
       .take(takeQuery)
       .orderBy(orderByQuery, orderQuery)

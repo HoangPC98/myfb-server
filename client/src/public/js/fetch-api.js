@@ -7,13 +7,13 @@ const convertParams = (params, type) => {
     const keyParams = Object.keys(params)
     const valueParams = Object.values(params)
     console.log(keyParams, valueParams)
-    let stringParams = ''
+    let stringParams = type === 'q' ? '?' : '/'
     for (let i = 0; i < keyParams.length; ++i) {
         if(type === 'q'){
             stringParams += `${keyParams[i]}=${valueParams[i]}` + (i < length-1 ? '&' : '')
         }
         else if(type === 'p') {
-            stringParams += '/' + valueParams[i]
+            stringParams +=  valueParams[i] + '/'
         }
     }   
     console.log('paramsss', stringParams)
@@ -53,8 +53,9 @@ export const httpPost = async(endpoint, payload, isIncludeFile, headers) => {
 }
 
 export const httpGet = async(endpoint, params) => {
-    const stringParams = convertParams(params, 'q')
-    const uri = `${serverUrl}/${endpoint}?${stringParams}`
+    const stringParams = params ? convertParams(params, 'q') : '';
+    // const uri = `${serverUrl}/${endpoint}?${stringParams}`
+    const uri = serverUrl + endpoint + stringParams 
     console.log('>>>URI', uri)
     const options = {
         method: 'GET',

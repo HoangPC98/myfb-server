@@ -31,7 +31,7 @@ export class userFrindUser1672681566090 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE \`user_sessions\` CHANGE \`token\` \`token\` varchar(255) NULL`);
         await queryRunner.query(`ALTER TABLE \`notifications\` CHANGE \`deletedAt\` \`deletedAt\` datetime(6) NULL`);
         await queryRunner.query(`ALTER TABLE \`notifications\` CHANGE \`entity_id\` \`entity_id\` int NULL`);
-        await queryRunner.query(`ALTER TABLE \`notifications\` CHANGE \`entity_type\` \`entity_type\` enum ('friend_ships', 'posts', 'reactions', 'photos', 'comments', 'users', 'profiles', 'privacy') NULL`);
+        await queryRunner.query(`ALTER TABLE \`notifications\` CHANGE \`entity_type\` \`entity_type\` enum ('friendship', 'posts', 'reactions', 'photos', 'comments', 'users', 'profiles', 'privacy') NULL`);
         await queryRunner.query(`ALTER TABLE \`notifications\` CHANGE \`notify_type\` \`notify_type\` enum ('add friend request', 'accept', 'has react', 'has comment') NULL`);
         await queryRunner.query(`ALTER TABLE \`notification_receives\` CHANGE \`deletedAt\` \`deletedAt\` datetime(6) NULL`);
         await queryRunner.query(`ALTER TABLE \`notification_receives\` CHANGE \`user_id\` \`user_id\` int NULL`);
@@ -105,7 +105,7 @@ export class userFrindUser1672681566090 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE \`notification_receives\` CHANGE \`user_id\` \`user_id\` int NULL DEFAULT 'NULL'`);
         await queryRunner.query(`ALTER TABLE \`notification_receives\` CHANGE \`deletedAt\` \`deletedAt\` datetime(6) NULL DEFAULT 'NULL'`);
         await queryRunner.query(`ALTER TABLE \`notifications\` CHANGE \`notify_type\` \`notify_type\` enum ('add friend request', 'accept', 'has react', 'has comment') NULL DEFAULT 'NULL'`);
-        await queryRunner.query(`ALTER TABLE \`notifications\` CHANGE \`entity_type\` \`entity_type\` enum ('friend_ships', 'posts', 'reactions', 'photos', 'comments', 'users', 'profiles', 'privacy') NULL DEFAULT 'NULL'`);
+        await queryRunner.query(`ALTER TABLE \`notifications\` CHANGE \`entity_type\` \`entity_type\` enum ('friendship', 'posts', 'reactions', 'photos', 'comments', 'users', 'profiles', 'privacy') NULL DEFAULT 'NULL'`);
         await queryRunner.query(`ALTER TABLE \`notifications\` CHANGE \`entity_id\` \`entity_id\` int NULL DEFAULT 'NULL'`);
         await queryRunner.query(`ALTER TABLE \`notifications\` CHANGE \`deletedAt\` \`deletedAt\` datetime(6) NULL DEFAULT 'NULL'`);
         await queryRunner.query(`ALTER TABLE \`user_sessions\` CHANGE \`token\` \`token\` varchar(255) NULL DEFAULT 'NULL'`);

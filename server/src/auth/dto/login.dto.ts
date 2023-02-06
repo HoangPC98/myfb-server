@@ -4,7 +4,6 @@ export class LoginGoogleDto {
   @IsNotEmpty()
   @IsString()
   ggToken: string;
-
 }
 
 export class LoginUsrPswDto {

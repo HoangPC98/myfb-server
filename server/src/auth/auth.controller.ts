@@ -36,6 +36,7 @@ export class AuthController {
   @Public()
   @Post('signup/fillout-data')
   async signUp(@Body() signUpData: SignUpDto): Promise<any> {
+    console.log('signUp', signUpData)
     const result = await this.authService.signUpStep1(signUpData)
     return result
   }
@@ -43,6 +44,7 @@ export class AuthController {
   @Public()
   @Post('otp/get-new/na')
   async getNewOtp(@Body() otpGetNewBody: OtpGetNewDto): Promise<any> {
+    console.log('OTP resend',otpGetNewBody)
     return await this.authService.getNewOtp(otpGetNewBody.otp_type, otpGetNewBody.email_or_phone)
   } 
 

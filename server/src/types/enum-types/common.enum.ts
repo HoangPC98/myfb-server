@@ -10,7 +10,7 @@ export enum Order {
 }
 
 export enum EntityType {
-  FriendShip = 'friend_ships',
+  FriendShip = 'friendship',
   Post = 'posts',
   Reaction = 'reactions',
   Photo = 'photos',

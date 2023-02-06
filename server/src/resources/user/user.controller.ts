@@ -32,9 +32,9 @@ export class UserController {
   ) {}
 
   @Get('search')
-  searchByUsername(@GetCurrentUID() uid: number, @Query() q: {keyword: string}) {
+  searchByUsername(@GetCurrentUID() uid: number, @Query() q: {key: string}) {
     console.log('>>>>>>>>>>>>>>search by', q);
-    return this.userService.searchByUsername(uid, q.keyword);
+    return this.userService.searchByUsername(uid, q.key);
   }
 
   @Patch('info')

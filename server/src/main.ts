@@ -1,18 +1,19 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import { Logger, VersioningType, ValidationPipe } from '@nestjs/common';
+import { VersioningType, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TransformResponseInterceptor } from './common/interceptors/transform.response.interceptor';
 import * as admin from 'firebase-admin';
 import firebaseConfig from './resources/notification/config/fcm.config';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
+import logger from './utils/logger';
 // import firebaseConfig from './notification/firebaseConfig';
 
 async function bootstrap() {
-  const logger = new Logger(bootstrap.name);
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
 
   app.enableCors({
     exposedHeaders: ['Content-Disposition'],
@@ -30,10 +31,11 @@ async function bootstrap() {
     }),
   );
 
+  global.log = logger;
+
   const configService = app.get(ConfigService);
 
   // app.useGlobalInterceptors(new TransformResponseInterceptor());
-  console.log('>>>>>>>>>>>dirname: ' + __dirname)
   app.useStaticAssets(join(__dirname, 'assets'));
   app.setBaseViewsDir(join(__dirname, 'assets'));
   app.setViewEngine('ejs');
@@ -42,6 +44,6 @@ async function bootstrap() {
 
   const port = configService.get<number>('port');
   await app.listen(port);
-  logger.log(`listening on port ${port}`);
+  logger.debug(`listening on port ${port}`);
 }
 bootstrap();

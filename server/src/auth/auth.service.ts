@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConsoleLogger,
   forwardRef,
   Inject,
   Injectable,
@@ -75,6 +76,7 @@ export class AuthService {
 
   async signUpStep1(signUpData) {
     let emailOrPhone = checkEmailOrPhone(signUpData.email_or_phone)
+    console.log('onananan', signUpData)
     const userRec = await this.userRepo.createQueryBuilder().where(`${emailOrPhone} = :emp`, { emp: signUpData.email_or_phone }).execute()
     const userHoldForVerifying = await this.cacheManager.getter(`SsAccVerifying_${signUpData.email_or_phone}`)
     console.log('usersss', userHoldForVerifying, userRec)
@@ -89,6 +91,7 @@ export class AuthService {
         OTP_SECOND_REFRESH * 7.5
       )
       const newOtp = await this.otpGenerator(signUpData.email_or_phone, OtpType.VerifyEmailOrPhone, emailOrPhone)
+      console.log('=======> New Otp',newOtp)
       let otpMsg = `FB-${newOtp} is your ${emailOrPhone} verification code`
       if(emailOrPhone === 'phone_number'){
         await smsSender(signUpData.email_or_phone, otpMsg)
@@ -96,7 +99,7 @@ export class AuthService {
       }
       else {
         await mailSender(signUpData.email_or_phone, 'Verify your FB registration email', otpMsg)
-        return { code: 201, message: `OTP code has been send to  ${signUpData.email_or_phone}` }
+        return { code: 200, message: `OTP code has been send to  ${signUpData.email_or_phone}` }
       }
 
     } catch (err) {
@@ -108,7 +111,7 @@ export class AuthService {
     const checkOtpResult = { isValid: true, message: 'OTP is verified successfully' }
     let emailOrPhone = checkEmailOrPhone(emailOrPhoneNumber)
     var secret: string;
-
+    console.log('========> Incomuing OTP', otpCode, emailOrPhoneNumber, otpType)
     let userRec = await User.createQueryBuilder('user').where(`${emailOrPhone} = :emp`,{emp: emailOrPhoneNumber}).execute()
     console.log('>>>>>>userRec', userRec)
     if (userRec.length == 0 && otpType == OtpType.VerifyEmailOrPhone) {
@@ -184,11 +187,11 @@ export class AuthService {
     try {
       if(emp === 'phone_number'){
         await smsSender(emailOrPhoneNumber, otpMsg)
-        return { code: 201, message: `OTP code has been send to number ${emailOrPhoneNumber}` }
+        return { code: 200, message: `OTP code has been send to number ${emailOrPhoneNumber}` }
       }
       else {
         await mailSender(emailOrPhoneNumber, `OTP code ${otpType}`, otpMsg)
-        return { code: 201, message: `OTP code has been send to  ${emailOrPhoneNumber}` }
+        return { code: 200, message: `OTP code has been send to  ${emailOrPhoneNumber}` }
       }
     } catch (error) {
       return new InternalServerErrorException(error)
@@ -196,13 +199,15 @@ export class AuthService {
   }
 
   async loginUsrPsw(emailOrPhoneNumber: string, password: string, uuid: string, userAgent: string) {
+    console.log('login', emailOrPhoneNumber, password, uuid, userAgent)
     let emp = checkEmailOrPhone(emailOrPhoneNumber)
     let whereObj = {}
     whereObj[emp] = emailOrPhoneNumber;
     const foundUser = await this.userRepo.findOne({ where: whereObj })
+    console.log('>>>>>login founderUser', emp, foundUser)
+
     if (!foundUser)
       return new BadRequestException(`${emp} ${emailOrPhoneNumber} not found`);
-    
     const checkPass = await bcrypt.compare(password, foundUser.password) 
     if(checkPass === false)
       return new BadRequestException('Wrong password')

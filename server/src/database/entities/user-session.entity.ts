@@ -29,7 +29,10 @@ export class UserSession extends CustomBaseEntity {
   @Column({nullable: true})
   flag: number;
 
-  @Column()
+  @Column({
+    nullable: false,
+    default: Date.now()
+  })
   uuid: string;
 
   @Column({nullable: true})

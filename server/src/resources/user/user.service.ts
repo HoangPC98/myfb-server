@@ -4,6 +4,7 @@ import { User } from 'src/database/entities/user.entity';
 import { EntityType, UserInfoType, UserStatus } from 'src/types/enum-types/common.enum';
 
 import { searchResourceUnicode } from 'src/utils/search-engine.util';
+import { getMutual2List } from 'src/utils/common.util';
 
 import { UsersRepository } from './user.repository';
 import { updateEntityByField_Value } from 'src/repository/common.repository'
@@ -26,27 +27,26 @@ export class UserService {
 
   async searchByUsername(uid: number, keyword: string) {
     const allUsers= await this.userRepo.query(`
-    SELECT users.id, users.given_name, users.avatar_url, friend_ships.receiver_uid, friend_ships.sender_uid, friend_ships.friendship_status
+    SELECT users.id, users.given_name, users.avatar_url, friendship.receiver_uid, friendship.sender_uid, friendship.status
     FROM users 
-    JOIN friend_ships
-    ON users.id IN (friend_ships.sender_uid, friend_ships.receiver_uid)
+    JOIN friendship
+    ON users.id IN (friendship.sender_uid, friendship.receiver_uid)
     WHERE users.id <> ${uid}
     ORDER BY users.id
     `)
     const reqUserFriends = await this.userRepo.query(`
-    SELECT users.id, friend_ships.receiver_uid, friend_ships.sender_uid, friend_ships.friendship_status
+    SELECT users.id, friendship.receiver_uid, friendship.sender_uid, friendship.status
     FROM users 
-    JOIN friend_ships
-    ON users.id IN (friend_ships.sender_uid, friend_ships.receiver_uid)
+    JOIN friendship
+    ON users.id IN (friendship.sender_uid, friendship.receiver_uid)
     WHERE users.id = ${uid}
     `)
-    console.log('Current IAID',reqUserFriends)
     var reqUserFriendship = {
       id: reqUserFriends[0].id,
       friends: []
     }
     reqUserFriends.forEach(item=>{
-      if(item.friendship_status === FriendShipStatus.BeFriended)
+      if(item.status === FriendShipStatus.BeFriended)
         reqUserFriendship.friends.push(
           item.id === item.receiver_uid ? item.sender_uid : item.receiver_uid,
         )
@@ -56,39 +56,54 @@ export class UserService {
     let transfromResult = [];
     var listUid : number[] = [];
     var listUser = [];
-    allUsers.forEach(user => {
+  
+    var reqUserFriendBlockedArr = [];
+    for(let user of allUsers){
       let thisFriendUid = user.id === user.sender_uid ? user.receiver_uid : user.sender_uid
-      if(!listUid.includes(user.id)){
-        if(user.friendship_status === FriendShipStatus.BeFriended){
-          listUser.push({
-            id: user.id,
-            given_name: user.given_name,
-            avatar_url: user.avatar_url,
-            friends: [thisFriendUid]
-          });
-          listUid.push(user.id)
-        }
+      if(uid === user.receiver_uid || uid === user.sender_uid){
+        if( user.status === FriendShipStatus.Blocked)
+          continue;
+        
+        else if(user.status === FriendShipStatus.BeFriended)
+          user['friendship_2u'] = FriendShipStatus.BeFriended
+        else if(user.status === FriendShipStatus.Folowing)
+          user['friendship_2u'] = FriendShipStatus.Folowing
+        else if(user.status === FriendShipStatus.Pending)
+          user['friendship_2u'] = FriendShipStatus.Pending
+        
       }
-      else{
-       listUser[listUser.length-1].friends.push(thisFriendUid)
-      }
-    })
+        if(user.status !== FriendShipStatus.Blocked && !reqUserFriendBlockedArr.includes(user.id)) {
+          if( !listUid.includes(user.id)){
+            listUser.push({
+              id: user.id,
+              given_name: user.given_name,
+              avatar_url: user.avatar_url,
+              friends: [thisFriendUid],
+              friendship_2u: user.friendship_2u ? user.friendship_2u : 'unfriend'
+            });
+            listUid.push(user.id)
+          }
+          else
+            listUser[listUser.length-1].friends.push(thisFriendUid)
+        }           
+    }
     const filterUser = searchResourceUnicode(keyword, listUser, 'given_name');
-    console.log('LIST FILTER',filterUser);
-    let reulst = filterUser.map(user =>{
+    let result = filterUser.map(user =>{
+      console.log('MUTUAL: ', getMutual2List(user.friends, reqUserFriendship.friends))
       return {
-        ...user,
-        mutual_friend: user.friends.reduce((acc, friend)=>{
-          if(reqUserFriendship.friends.includes(friend))
-            acc.push(friend);
-            return acc;
-        }, [])
+        user_id: user.id,
+        user_name: user.given_name,
+        user_avatar_url: user.avatar_url,
+        num_friend: user.friends.length,
+        friendship_2u: user.friendship_2u,
+        mutual_friend: getMutual2List(user.friends, reqUserFriendship.friends)
       }
     })
-    console.log('>>>>>>reulst',reulst)
+    console.log('>>>filterUser', result)
+    
     return {
       code: 200,
-      data: filterUser,
+      data: result,
     }
   }
 
@@ -120,23 +135,20 @@ export class UserService {
       'Privacy',
     ]);
 
-    console.log('USERINFO', userInfo);
 
-    const { listFriend, countAllFriend } =
+    const listFriend =
       await this.userRepositoty.getListFriendByUserId(user_id, isMine);
+    console.log('>>>ist friend>>>',listFriend)
     const listFriendMaping = listFriend.map((item) => {
-      let thisFriend: User;
-      if (user_id === item.sender_uid) thisFriend = item.Receiver;
-      else thisFriend = item.Sender;
-
-      const newItem = {
-        friend_name: thisFriend.given_name,
+      let thisFriend: User = user_id === item.sender_uid ? item.Receiver : item.Sender;
+      return {
+        user_id: thisFriend.id,
+        username: thisFriend.given_name,
         avatar_url: thisFriend.avatar_url,
       };
-      return newItem;
     });
 
-    console.log('listFrined', listFriend);
+    // console.log('listFrined', listFriend);
 
     const listPhoto = await this.userRepositoty.getListPhotosByUserId(user_id);
     const listPhotoMaping = listPhoto.map((item) => {
@@ -168,10 +180,10 @@ export class UserService {
       };
     });
 
-    const result = await {
+    const result = {
       userInfo,
       friends: {
-        count_all: countAllFriend,
+        // count_all: countAllFriend,
         list: listFriendMaping,
       },
       photos: {
@@ -180,7 +192,7 @@ export class UserService {
       },
       posts: listPostMaping,
     };
-    return { response: result };
+    return { code: 200, data: result };
   }
 
   private setGivenName(firstName: string, lastName: string): string {

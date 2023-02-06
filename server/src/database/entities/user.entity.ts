@@ -64,7 +64,7 @@ export class User extends CustomBaseEntity {
   @Column({unique: true, nullable: true })
   phone_number: string;
 
-  @Column({select: false, nullable: true, default: null})
+  @Column({nullable: true, default: null})
   password: string;
 
   @Column({unique: true, select: false })

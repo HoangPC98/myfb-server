@@ -5,16 +5,17 @@ const port = 3333
 import authRoute from './routes/auth.route.js'
 import cmRoute from './routes/common.route.js'
 import cookieParser from 'cookie-parser'
+import logger from './utils/logger.js'
 app.use(cookieParser())
 
 // use Routes
 app.use(authRoute)
 app.use(cmRoute)
 
-global.log = (string) =>{
-    console.log(string)
-}
+// view engine
+app.set('view engine', 'ejs');
 
+global.log = logger;
 
 app.use(express.static(process.cwd() + '/src/public'))
 

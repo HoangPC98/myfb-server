@@ -4,8 +4,8 @@ $('#search-input').keypress(async function(e){
     if(e.keyCode === 13){
         var thisInputVal = $('#search-input').val();
        
-        let keyword = thisInputVal.replaceAll(' ', '_')
-        window.localStorage.setItem('get_search', JSON.stringify({url: 'users/search', q: {keyword}}))
+        let key = thisInputVal.replaceAll(' ', '_')
+        window.localStorage.setItem('get_search', JSON.stringify({url: '/users/search', q: {key}}))
         window.location.href = '/search-result'
     }
 })

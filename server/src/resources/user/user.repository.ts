@@ -63,8 +63,11 @@ export class UsersRepository {
 
 
   async getListPostByUserId(user_id: number, isMine?: boolean) {
-    const whereQuery = { owner_id: user_id };
-    if (!isMine) whereQuery['privacy_mode'] = PrivacyMode.Public;
+    const whereQuery: [p1: string, p2: object] = ['owner_id = :owner_id', { owner_id: user_id }];
+    if (!isMine){
+      whereQuery[0] += 'privacy_mode = :privacy_mode'
+      whereQuery[1]['privacy_mode'] = PrivacyMode.Public;
+    } 
     const listPost: Post[] = await getEntityPagination(
       { use: QueryOption.UseRepository, repository: this.postRepo },
       EntityType.Post,
@@ -82,7 +85,11 @@ export class UsersRepository {
   }
 
   async getListFriendByUserId(user_id: number, isMine?: boolean) {
-    const whereQuery = `(sender_uid = ${user_id} OR receiver_uid = ${user_id}) AND  status = '${FriendShipStatus.BeFriended}'`;
+    const whereQuery = [
+      {sender_uid: user_id},
+      {receiver_uid: user_id},
+    ]
+    // const whereQuery = `(sender_uid = ${user_id} OR receiver_uid = ${user_id}) AND  status = '${FriendShipStatus.BeFriended}'`;
     const listFriend: FriendShip[] = await getEntityPagination(
       { use: QueryOption.UseRepository, repository: this.friendshipRepo },
       EntityType.FriendShip,
@@ -96,20 +103,20 @@ export class UsersRepository {
       ['Sender', 'Receiver'],
     );
 
-    const countAllFriend = await countEntityRecord(
-      this.friendshipRepo,
-      whereQuery,
-    );
+    // const countAllFriend = await countEntityRecord(
+    //   this.friendshipRepo,
+    //   whereQuery,
+    // );
 
-    console.log('LISTFRIEND', countAllFriend, listFriend);
-    return { listFriend, countAllFriend };
+    console.log('LISTFRIEND', listFriend);
+    return listFriend;
   }
 
   async getListPhotosByUserId(user_id: number, isMine?: boolean) {
     const listPhoto: Photo[] = await getEntityPagination(
       { use: QueryOption.UseRepository, repository: this.photoRepo },
       EntityType.Photo,
-      { owner_id: user_id },
+      ['owner_id = :owner_id',{ owner_id: user_id }],
       {
         page_size: this.PREVIEW_PHOTO_ITEM_NUM,
         page_number: 1,
