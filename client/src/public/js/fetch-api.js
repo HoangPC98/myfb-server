@@ -3,57 +3,22 @@ const commonHeader = {
     "Content-Type": "application/json",
 }
 
-const convertParams = (params) => {
+const convertParams = (params, type) => {
     const keyParams = Object.keys(params)
     const valueParams = Object.values(params)
     console.log(keyParams, valueParams)
-    let stringParams = ''
+    let stringParams = type === 'q' ? '?' : '/'
     for (let i = 0; i < keyParams.length; ++i) {
-        stringParams += `${keyParams[i]}=${valueParams[i]}`
-        if (i < keyParams.length - 1) stringParams += '&'
-    }
-    return stringParams
-}
-
-export const postRequest = async(endpoint, authorization, payload, isIncludeFile) => {
-    const uri = `${serverUrl}/${endpoint}`
-    const options = {
-        method: "POST",
-    }
-
-    if (isIncludeFile) {
-        options.headers = {
-            Authorization: authorization,
+        if(type === 'q'){
+            stringParams += `${keyParams[i]}=${valueParams[i]}` + (i < length-1 ? '&' : '')
         }
-        options.body = payload
-        console.log('is file', isIncludeFile)
-    } else {
-        options.headers = {
-            Authorization: authorization,
-            "Content-Type": "application/json",
+        else if(type === 'p') {
+            stringParams +=  valueParams[i] + '/'
         }
-        options.body = JSON.stringify(payload)
-    }
-
-    console.log('data>>>>', options)
-    return await fetch(uri, options)
+    }   
+    console.log('paramsss', stringParams)
+        return stringParams
 }
-
-export const getRequest = async(endpoint, params) => {
-    const stringParams = convertParams(params)
-    const uri = `${serverUrl}/${endpoint}?${stringParams}`
-    const authorization = 'Bearer ' + getCookieByName('access_token')
-    const options = {
-        method: 'GET',
-        headers: {
-            Authorization: authorization,
-            "Content-Type": "application/json",
-        },
-    }
-    return fetch(uri, options).then(response => response.json()).then(data => { return data }).catch(err => { console.log(err) });
-}
-
-
 
 export const getCookieByName = function(cookieName) {
     let cookie = {};
@@ -63,3 +28,63 @@ export const getCookieByName = function(cookieName) {
     })
     return cookie[cookieName];
 }
+
+const atokenCookie = getCookieByName('access_token');
+if(atokenCookie)
+    var bearer_token = 'Bearer ' + atokenCookie
+
+export const httpPost = async(endpoint, payload, isIncludeFile, headers) => {
+    const uri = `${serverUrl}/${endpoint}`
+    const options = {
+        method: "POST",
+    }
+    
+    if (isIncludeFile) {
+        options.body = payload
+    } else {
+        options.headers = {
+            Authorization: bearer_token,
+            "Content-Type": "application/json",
+        }
+        options.body = JSON.stringify(payload)
+    }
+
+    return await fetch(uri, options).then(response => response.json()).then(data => { return data }).catch(err => { console.log(err) });
+}
+
+export const httpGet = async(endpoint, params) => {
+    const stringParams = params ? convertParams(params, 'q') : '';
+    // const uri = `${serverUrl}/${endpoint}?${stringParams}`
+    const uri = serverUrl + endpoint + stringParams 
+    console.log('>>>URI', uri)
+    const options = {
+        method: 'GET',
+        headers: {
+            Authorization: bearer_token,
+            "Content-Type": "application/json",
+        },
+    }
+    return await fetch(uri, options).then(response => response.json()).then(data => { return data }).catch(err => { console.log(err) });
+}
+
+export const httpUpdate = async(endpoint, params) => {
+    const stringParams = convertParams(params, 'p')
+    const uri = `${serverUrl}/${endpoint}?${stringParams}`
+    console.log('>>>URI', uri)
+
+    const options = {
+        method: 'PUT',
+        headers: {
+            Authorization: bearer_token,
+            "Content-Type": "application/json",
+        },
+    }
+    return await fetch(uri, options).then(response => response.json()).then(data => { return data }).catch(err => { console.log(err) });
+}
+
+export const apis = {
+    addFriend: 'friendship/request/new',
+    cancelFriendRequest: 'friendship/request/cancel'
+}
+
+

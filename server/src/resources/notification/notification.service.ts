@@ -22,7 +22,7 @@ export class NotificationService {
     message?: string,
   ) {
     // get receiver_fcmtoken
-    const receiver_fcm_tokens = await this.notificationRepository.getFcmToken(
+    const receiver_tokens = await this.notificationRepository.getFcmToken(
       receiver_uid,
     );
 
@@ -57,7 +57,7 @@ export class NotificationService {
     };
 
     const pushNotifyObject = {
-      tokens: receiver_fcm_tokens,
+      tokens: receiver_tokens,
       data: {
         message: message,
         redirect: JSON.stringify(redirectObject),

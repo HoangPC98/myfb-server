@@ -51,6 +51,10 @@ body::-webkit-scrollbar {
     }
 }
 
+.body{
+    margin-top: var(--header-height);
+}
+
 .fb-alg-center {
     display: flex;
     flex-direction: column;

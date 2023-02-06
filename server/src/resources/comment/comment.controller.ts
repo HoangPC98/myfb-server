@@ -7,7 +7,7 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { GetCurrentUID } from 'src/auth/decorators/getUid.derator';
+import { GetCurrentUID } from 'src/auth/decorators/getRequest.decorator';
 import { CommentService } from './comment.service';
 import { CommentDto } from './dto/add-comment.dto';
 

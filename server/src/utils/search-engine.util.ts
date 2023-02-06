@@ -1,4 +1,4 @@
-export const vnmListChar = [
+const vnmListChar = [
   'à',
   'á',
   'ả',
@@ -66,29 +66,25 @@ export const vnmListChar = [
   'ỵ',
   'đ',
 ];
-export const searchByUserNameUnicode = (
-  inputStr: string,
-  listUser: Array<any>,
-) => {
-  console.log(listUser);
-  const listFilter = listUser.filter((userItem) => {
-    if (isVietnameseChar(inputStr)) {
-      if (
-        userItem['given_name']
-          .toLowerCase()
-          .includes(inputStr.toLocaleLowerCase())
-      )
-        return userItem;
-    } else {
-      const newinputStr = convertToAccent(inputStr);
-      const newUserName = convertToAccent(userItem['given_name']);
-      if (newUserName.includes(newinputStr)) return userItem;
-    }
+const searchResourceUnicode = (keyword: string, arr: any[], searchBy: string) => {
+  const listFilter = arr.filter((item) => {
+      if (isVietnameseChar(keyword)) {
+          if (
+              item[searchBy]
+                  .toLowerCase()
+                  .includes(keyword.toLocaleLowerCase())
+          )
+              return item;
+      } else {
+          const newString = convertToAccent(keyword);
+          const newUserName = convertToAccent(item[searchBy]);
+          if (newUserName.includes(newString)) return item;
+      }
   });
   return listFilter;
 };
 
-const convertToAccent = (inputStr: string): string => {
+const convertToAccent = (inputStr: string) => {
   let newStr = inputStr.normalize('NFD');
   //remove accent
   newStr = newStr.replace(/[\u0300-\u036f]/g, '');
@@ -102,8 +98,10 @@ const convertToAccent = (inputStr: string): string => {
 
 const isVietnameseChar = (inputStr: string) => {
   for (let i = 0; i < inputStr.length; i++) {
-    if (vnmListChar.includes(inputStr.charAt(i))) {
-      return true;
-    }
+      if (vnmListChar.includes(inputStr.charAt(i))) {
+          return true;
+      }
   }
 };
+
+export { searchResourceUnicode }

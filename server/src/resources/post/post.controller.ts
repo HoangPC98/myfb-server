@@ -19,7 +19,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Public } from 'src/auth/decorators/public-auth.decorator';
 import { extname } from 'path';
 import { diskStorage } from 'multer';
-import { GetCurrentUID } from 'src/auth/decorators/getUid.derator';
+import { GetCurrentUID } from 'src/auth/decorators/getRequest.decorator';
 import { FileType } from 'src/types/enum-types/common.enum';
 import { PhotoType } from 'src/database/entities/photo.entity';
 

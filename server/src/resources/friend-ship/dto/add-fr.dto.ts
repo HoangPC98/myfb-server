@@ -5,7 +5,4 @@ export class AddFriendDto {
   @IsNumber()
   receiver_uid: number;
 
-  @IsOptional()
-  @IsNumber()
-  sender_uid: number;
 }

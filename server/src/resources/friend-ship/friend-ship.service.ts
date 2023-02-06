@@ -19,29 +19,30 @@ export class FriendShipService {
   ) {}
   private readonly notFoundAddFrErrMsg = 'Not Found Add Friend Request';
 
-  async addFriendRequest(addFriendDto) {
+  async addFriendRequest(sender_uid: number, receiver_uid: number) {
     const checkExistFriendShip =
       await this.friendshipRepository.getOneFriendship({
-        sender_uid: addFriendDto.sender_uid,
-        receiver_uid: addFriendDto.receiver_uid,
+        sender_uid: sender_uid,
+        receiver_uid: receiver_uid,
       });
     if (checkExistFriendShip) {
       throw new BadRequestException(`Friend Request have been existed`);
     }
 
     let newAddFriendRequest = new FriendShip();
-    newAddFriendRequest = { ...addFriendDto, status: FriendShipStatus.Pending };
+    newAddFriendRequest.receiver_uid = receiver_uid;
+    newAddFriendRequest.sender_uid = sender_uid;
+    newAddFriendRequest.status = FriendShipStatus.Pending;
     try {
-      console.log(newAddFriendRequest);
+      console.log('ADD FRIEND...',newAddFriendRequest);
       const createdFriendShip = await this.friendShipRepo.save(
         newAddFriendRequest,
       );
 
       // push notification
-
       await this.notificationService.sendNotificationFromOneToOne(
-        addFriendDto.sender_uid,
-        addFriendDto.receiver_uid,
+        sender_uid,
+        receiver_uid,
         createdFriendShip.id,
         NotifyType.AddFriendRequest,
         EntityType.FriendShip,
@@ -66,13 +67,13 @@ export class FriendShipService {
       },
       ['Sender', 'Receiver'],
     );
-    thisRequest.friendship_status =
+    thisRequest.status =
       option === ReplyAddFrRequest.Accept
         ? FriendShipStatus.BeFriended
-        : FriendShipStatus.RejectFriend;
+        : FriendShipStatus.UnFriend;
 
     if (option === ReplyAddFrRequest.Accept) {
-      thisRequest.friendship_status = FriendShipStatus.BeFriended;
+      thisRequest.status = FriendShipStatus.BeFriended;
       const sender_uid = thisRequest.receiver_uid;
       const receiver_uid = thisRequest.sender_uid;
 
@@ -86,14 +87,14 @@ export class FriendShipService {
         message,
       );
     } else {
-      thisRequest.friendship_status = FriendShipStatus.RejectFriend;
+      thisRequest.status = FriendShipStatus.UnFriend;
     }
     return await this.friendShipRepo.save(thisRequest);
 
     // push notification
   }
 
-  async cancelFriendRequest(request_id, sender_uid) {
+  async cancelFriendRequest(request_id: number, sender_uid: number) {
     try {
       return await this.friendShipRepo.softDelete({
         id: request_id,
@@ -105,4 +106,6 @@ export class FriendShipService {
       );
     }
   }
+
+ 
 }

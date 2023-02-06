@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import CustomBaseEntity from './base-entity';
 import { Post } from './post.entity';
 import { User } from './user.entity';
@@ -13,6 +13,9 @@ export enum RelationshipStatus {
 export class Profile extends CustomBaseEntity {
   @PrimaryGeneratedColumn()
   user_id: number;
+
+  @OneToOne(() => User, (user) => user.Profile) // specify inverse side as a second parameter
+  User: User
 
   @Column()
   bio: string;
@@ -39,4 +42,6 @@ export class Profile extends CustomBaseEntity {
 
   @Column({ unique: true })
   email: string;
+
+
 }

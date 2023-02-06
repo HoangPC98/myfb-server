@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import CustomBaseEntity from './base-entity';
 import { FriendShip } from './friend-ship.entity';
-import { LoginSession } from './login-session.entity';
+import { UserSession } from './user-session.entity';
 import { NotificationReceive } from 'src/database/entities/notification-receive.entity';
 // import { NotificationReceive } from './notification-receive';
 import { Post } from './post.entity';
@@ -17,17 +17,7 @@ import { Profile } from './profile.entity';
 import { Photo } from './photo.entity';
 import { DEFAULT_AVATAR_URL } from 'src/constants/common.constant';
 
-export enum UserStatus {
-  Active = 'active',
-  Inactive = 'inactive',
-  Locked = 'locked',
-}
-
-export enum Gender {
-  Male = 'male',
-  Female = 'female',
-  Other = 'other',
-}
+import { AuthType, UserStatus, Gender } from 'src/types/enum-types/common.enum';
 
 @Entity('users')
 export class User extends CustomBaseEntity {
@@ -42,6 +32,14 @@ export class User extends CustomBaseEntity {
   })
   user_status: UserStatus;
 
+  @Column({
+    type: 'enum',
+    enum: AuthType,
+    default: AuthType.UsernamePasswordAuth,
+    nullable: false,
+  })
+  auth_type: AuthType;
+
   @Column()
   first_name: string;
 
@@ -54,18 +52,27 @@ export class User extends CustomBaseEntity {
   @Column({ type: 'enum', enum: Gender, default: null, nullable: true })
   gender: Gender;
 
-  @Column({ nullable: false, default: DEFAULT_AVATAR_URL })
+  @Column({ nullable: true, default: DEFAULT_AVATAR_URL })
   avatar_url: string;
 
   @Column()
   cover_photo_url: string;
 
-  @Column({ unique: true })
+  @Column({ unique: true, nullable: true })
   email: string;
 
-  @OneToOne(() => Profile)
+  @Column({unique: true, nullable: true })
+  phone_number: string;
+
+  @Column({nullable: true, default: null})
+  password: string;
+
+  @Column({unique: true, select: false })
+  secret: string;
+
+  @OneToOne(() => Profile, (profile) => profile.User) // specify inverse side as a second parameter
   @JoinColumn()
-  Profile: Profile;
+  Profile: Profile
 
   @OneToOne(() => Privacy)
   @JoinColumn()
@@ -77,8 +84,11 @@ export class User extends CustomBaseEntity {
   @OneToMany(() => Photo, (photo) => photo.Owner, { cascade: true })
   Photos: Photo[];
 
-  @OneToMany(() => LoginSession, (loginSession) => loginSession.User)
-  LoginSessions: LoginSession[];
+  @OneToMany(() => UserSession, (loginSession) => loginSession.User)
+  UserSessions: UserSession[];
+
+  // @OneToMany(() => FriendShip, (friendship) => friendship.Sender || friendship.Receiver)
+  // FriendShips: FriendShip[];
 
   @OneToMany(
     () => NotificationReceive,

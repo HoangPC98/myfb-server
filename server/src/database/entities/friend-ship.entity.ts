@@ -11,12 +11,13 @@ import { User } from './user.entity';
 
 export enum FriendShipStatus {
   Pending = 'pending',
-  BeFriended = 'beFriended',
-  Blocked = 'blocked',
-  RejectFriend = 'rejectFriend',
+  BeFriended = 'friend',
+  Blocked = 'block',
+  UnFriend = 'unfriend',
+  Folowing = 'follow',
 }
 
-@Entity('friend_ships')
+@Entity('friendship')
 export class FriendShip extends CustomBaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
@@ -33,7 +34,7 @@ export class FriendShip extends CustomBaseEntity {
     default: 'pending',
     nullable: true,
   })
-  friendship_status: FriendShipStatus;
+  status: FriendShipStatus;
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'sender_uid' })

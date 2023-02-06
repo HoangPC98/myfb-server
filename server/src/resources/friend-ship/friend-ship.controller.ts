@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Param, Patch, Post } from '@nestjs/common';
-import { GetCurrentUID } from 'src/auth/decorators/getUid.derator';
+import { GetCurrentUID } from 'src/auth/decorators/getRequest.decorator';
 import { AddFriendDto } from './dto/add-fr.dto';
 import { ReplyRequestDto } from './dto/reply-request.dto';
 import { FriendShipService } from './friend-ship.service';
@@ -8,12 +8,12 @@ import { FriendShipService } from './friend-ship.service';
 export class FriendShipController {
   constructor(private readonly friendShipService: FriendShipService) {}
 
-  @Post('new')
+  @Post('/request/new')
   async addFriendRequest(
     @GetCurrentUID() sender_uid: number,
     @Body() addFriendDto: AddFriendDto,
   ) {
-    return await this.friendShipService.addFriendRequest(addFriendDto);
+    return await this.friendShipService.addFriendRequest(sender_uid, addFriendDto.receiver_uid);
   }
 
   @Patch('request-reply')
@@ -28,13 +28,13 @@ export class FriendShipController {
     );
   }
 
-  @Delete('request-cancel/:request_id')
+  @Delete('request-cancel/:receiver_uid')
   async cancelFriendRequest(
     @GetCurrentUID() sender_uid: number,
-    @Param() request_id: number,
+    @Param() receiver_uid: number,
   ) {
     return await this.friendShipService.cancelFriendRequest(
-      request_id,
+      receiver_uid,
       sender_uid,
     );
   }

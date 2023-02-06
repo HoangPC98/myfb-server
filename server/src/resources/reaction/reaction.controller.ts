@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
-import { GetCurrentUID } from 'src/auth/decorators/getUid.derator';
+import { GetCurrentUID } from 'src/auth/decorators/getRequest.decorator';
 import { EntityType } from 'src/types/enum-types/common.enum';
 import { PostReactionDto } from './dto/post-reaction.dto';
 import { ReactionService } from './reaction.service';

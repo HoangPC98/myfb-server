@@ -1,6 +1,6 @@
 import {
-    postRequest,
-    getRequest,
+    httpPost,
+    httpGet,
     getCookieByName
 } from '/js/fetch-api.js';
 
@@ -68,7 +68,7 @@ const upload = async(payload) => {
     }
 
     console.log('fom datatata', data)
-    const resonse = await postRequest('posts/new', headerAUthorization, data, isIncludeFile)
+    const resonse = await httpPost('posts/new-post', headerAUthorization, data, isIncludeFile)
     if (resonse.status === 201) alert('Upload successfully')
     else alert('Failed to upload')
     window.location.reload()
